@@ -155,22 +155,13 @@ void MixColumns(unsigned Nb, byte state[]) {
                            state[1 * Nb + j],
                            state[2 * Nb + j],
                            state[3 * Nb + j]};
-        new_state[0 * Nb + j] = multiply(0x02, r[0]) ^
-                                multiply(0x03, r[1]) ^
-                                r[2] ^
-                                r[3];
-        new_state[1 * Nb + j] = r[0] ^
-                                multiply(0x02, r[1]) ^
-                                multiply(0x03, r[2]) ^
-                                r[3];
-        new_state[2 * Nb + j] = r[0] ^
-                                r[1] ^
-                                multiply(0x02, r[2]) ^
-                                multiply(0x03, r[3]);
-        new_state[3 * Nb + j] = multiply(0x03, r[0]) ^
-                                r[1] ^
-                                r[2] ^
-                                multiply(0x02, r[3]);
+        for (unsigned i = 0; i < 4; ++i) {
+            byte product = 0;
+            for (unsigned k = 0; k < 4; ++k) {
+                product ^= multiply(r[k], MixColumns_multiplier[(4 - i + k) % 4]);
+            }
+            new_state[i * Nb + j] = product;
+        }
     }
 
     memcpy(state, new_state, 4 * Nb * sizeof(byte));
@@ -190,22 +181,13 @@ void InvMixColumns(unsigned Nb, byte state[]) {
                            state[1 * Nb + j],
                            state[2 * Nb + j],
                            state[3 * Nb + j]};
-        new_state[0 * Nb + j] = multiply(0x0e, r[0]) ^
-                                multiply(0x0b, r[1]) ^
-                                multiply(0x0d, r[2]) ^
-                                multiply(0x09, r[3]);
-        new_state[1 * Nb + j] = multiply(0x09, r[0]) ^
-                                multiply(0x0e, r[1]) ^
-                                multiply(0x0b, r[2]) ^
-                                multiply(0x0d, r[3]);
-        new_state[2 * Nb + j] = multiply(0x0d, r[0]) ^
-                                multiply(0x09, r[1]) ^
-                                multiply(0x0e, r[2]) ^
-                                multiply(0x0b, r[3]);
-        new_state[3 * Nb + j] = multiply(0x0b, r[0]) ^
-                                multiply(0x0d, r[1]) ^
-                                multiply(0x09, r[2]) ^
-                                multiply(0x0e, r[3]);
+        for (unsigned i = 0; i < 4; ++i) {
+            byte product = 0;
+            for (unsigned k = 0; k < 4; ++k) {
+                product ^= multiply(r[k], InvMixColumns_multiplier[(4 - i + k) % 4]);
+            }
+            new_state[i * Nb + j] = product;
+        }
     }
 
     memcpy(state, new_state, 4 * Nb * sizeof(byte));
