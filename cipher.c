@@ -43,6 +43,44 @@ byte *Cipher(unsigned Nb, unsigned Nr, const byte in[], word **w) {
     return state;
 }
 
+byte *InvCipher(unsigned Nb, unsigned Nr, const byte in[], word **w) {
+#ifdef DEBUG
+    printf("Input\n");
+    print_state(in);
+#endif
+
+    byte *state = (byte *)malloc(4 * Nb * sizeof(byte));
+    memcpy(state, in, 4 * Nb * sizeof(byte));
+
+    AddRoundKey(Nb, state, w[Nr]);
+
+    for (unsigned round = Nr - 1; round > 0; --round) {
+#ifdef DEBUG
+        printf("Round %d\n\n", round);
+#endif
+
+        InvShiftRows(Nb, state);
+        InvSubBytes(Nb, state);
+        AddRoundKey(Nb, state, w[round]);
+        InvMixColumns(Nb, state);
+    }
+
+#ifdef DEBUG
+    printf("Round 0\n\n");
+#endif
+
+    InvShiftRows(Nb, state);
+    InvSubBytes(Nb, state);
+    AddRoundKey(Nb, state, w[0]);
+
+#ifdef DEBUG
+    printf("Output\n");
+    print_state(state);
+#endif
+
+    return state;
+}
+
 void SubBytes(unsigned Nb, byte state[]) {
     for (unsigned pos = 0; pos < 4 * Nb; ++pos) {
         state[pos] = s_box[state[pos]];
@@ -50,6 +88,17 @@ void SubBytes(unsigned Nb, byte state[]) {
 
 #ifdef DEBUG
     printf("After SubBytes\n");
+    print_state(state);
+#endif
+}
+
+void InvSubBytes(unsigned Nb, byte state[]) {
+    for (unsigned pos = 0; pos < 4 * Nb; ++pos) {
+        state[pos] = inverse_s_box[state[pos]];
+    }
+
+#ifdef DEBUG
+    printf("After InvSubBytes\n");
     print_state(state);
 #endif
 }
@@ -68,6 +117,24 @@ void ShiftRows(unsigned Nb, byte state[]) {
 
 #ifdef DEBUG
     printf("After ShiftRows\n");
+    print_state(state);
+#endif
+}
+
+void InvShiftRows(unsigned Nb, byte state[]) {
+    byte *new_state = (byte *)malloc(4 * Nb * sizeof(byte));
+
+    for (unsigned i = 0; i < 4; ++i) {
+        for (unsigned j = 0; j < Nb; ++j) {
+            new_state[i * Nb + j] = state[i * Nb + (Nb + j - i) % Nb];
+        }
+    }
+
+    memcpy(state, new_state, 4 * Nb * sizeof(byte));
+    free(new_state);
+
+#ifdef DEBUG
+    printf("After InvShiftRows\n");
     print_state(state);
 #endif
 }
@@ -103,6 +170,41 @@ void MixColumns(unsigned Nb, byte state[]) {
 
 #ifdef DEBUG
     printf("After MixColumns\n");
+    print_state(state);
+#endif
+}
+
+void InvMixColumns(unsigned Nb, byte state[]) {
+    byte *new_state = (byte *)malloc(4 * Nb * sizeof(byte));
+
+    for (unsigned j = 0; j < Nb; ++j) {
+        const byte r[4] = {state[0 * Nb + j],
+                           state[1 * Nb + j],
+                           state[2 * Nb + j],
+                           state[3 * Nb + j]};
+        new_state[0 * Nb + j] = multiply(0x0e, r[0]) ^
+                                multiply(0x0b, r[1]) ^
+                                multiply(0x0d, r[2]) ^
+                                multiply(0x09, r[3]);
+        new_state[1 * Nb + j] = multiply(0x09, r[0]) ^
+                                multiply(0x0e, r[1]) ^
+                                multiply(0x0b, r[2]) ^
+                                multiply(0x0d, r[3]);
+        new_state[2 * Nb + j] = multiply(0x0d, r[0]) ^
+                                multiply(0x09, r[1]) ^
+                                multiply(0x0e, r[2]) ^
+                                multiply(0x0b, r[3]);
+        new_state[3 * Nb + j] = multiply(0x0b, r[0]) ^
+                                multiply(0x0d, r[1]) ^
+                                multiply(0x09, r[2]) ^
+                                multiply(0x0e, r[3]);
+    }
+
+    memcpy(state, new_state, 4 * Nb * sizeof(byte));
+    free(new_state);
+
+#ifdef DEBUG
+    printf("After InvMixColumns\n");
     print_state(state);
 #endif
 }
