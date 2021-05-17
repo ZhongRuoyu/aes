@@ -36,14 +36,14 @@ word *KeyExpansion(unsigned Nb, unsigned Nr, const word key[], unsigned Nk) {
     return w;
 }
 
-word SubWord(word w) {
-    byte *bytes = to_bytes(w);
+word SubWord(word in) {
+    byte *bytes = to_bytes(in);
     for (unsigned i = 0; i < 4; ++i) {
         bytes[i] = s_box[bytes[i]];
     }
-    word output = to_word(bytes[3], bytes[2], bytes[1], bytes[0]);
+    word out = to_word(bytes[3], bytes[2], bytes[1], bytes[0]);
     free(bytes);
-    return output;
+    return out;
 }
 
 word RotWord(word w) {
@@ -51,12 +51,12 @@ word RotWord(word w) {
 }
 
 word **wrap_key(unsigned Nb, unsigned Nr, const word *w, unsigned Nk) {
-    word **output = (word **)malloc((Nr + 1) * sizeof(const word *));
+    word **out = (word **)malloc((Nr + 1) * sizeof(const word *));
     for (unsigned i = 0; i < Nr + 1; ++i) {
-        output[i] = (word *)malloc(Nb * sizeof(word));
+        out[i] = (word *)malloc(Nb * sizeof(word));
         for (unsigned j = 0; j < Nb; ++j) {
-            output[i][j] = w[i * Nb + j];
+            out[i][j] = w[i * Nb + j];
         }
     }
-    return output;
+    return out;
 }
