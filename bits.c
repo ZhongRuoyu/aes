@@ -7,7 +7,7 @@ byte *to_bytes(unsigned Nb, const word w[]) {
     for (unsigned j = 0; j < Nb; ++j) {
         word x = w[j];
         for (unsigned i = 0; i < 4; ++i) {
-            bytes[i * Nb + j] = (x >> (8 * i)) & 0xff;
+            bytes[i * Nb + j] = (x >> (8 * (3 - i))) & 0xff;
         }
     }
     return bytes;
