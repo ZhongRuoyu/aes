@@ -27,6 +27,10 @@ byte *cipher(unsigned Nb, unsigned Nr, byte in[], word w[][4]) {
         AddRoundKey(Nb, state, w[round]);
     }
 
+#ifdef DEBUG
+    printf("Round %d\n\n", Nr);
+#endif
+
     SubBytes(Nb, state);
     ShiftRows(Nb, state);
     AddRoundKey(Nb, state, w[Nr]);
