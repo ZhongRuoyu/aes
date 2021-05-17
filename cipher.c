@@ -7,7 +7,8 @@
 
 byte *Cipher(unsigned Nb, unsigned Nr, const byte in[], word **w) {
 #ifdef DEBUG
-    printf("Input\n");
+    printf("Cipher begins\n\n");
+    printf("Cipher input\n");
     print_state(in);
 #endif
 
@@ -18,7 +19,7 @@ byte *Cipher(unsigned Nb, unsigned Nr, const byte in[], word **w) {
 
     for (unsigned round = 1; round < Nr; ++round) {
 #ifdef DEBUG
-        printf("Round %d\n\n", round);
+        printf("Cipher round %d\n\n", round);
 #endif
 
         SubBytes(Nb, state);
@@ -28,7 +29,7 @@ byte *Cipher(unsigned Nb, unsigned Nr, const byte in[], word **w) {
     }
 
 #ifdef DEBUG
-    printf("Round %d\n\n", Nr);
+    printf("Cipher round %d\n\n", Nr);
 #endif
 
     SubBytes(Nb, state);
@@ -36,8 +37,9 @@ byte *Cipher(unsigned Nb, unsigned Nr, const byte in[], word **w) {
     AddRoundKey(Nb, state, w[Nr]);
 
 #ifdef DEBUG
-    printf("Output\n");
+    printf("Cipher output\n");
     print_state(state);
+    printf("Cipher ends\n\n");
 #endif
 
     return state;
@@ -45,18 +47,23 @@ byte *Cipher(unsigned Nb, unsigned Nr, const byte in[], word **w) {
 
 byte *InvCipher(unsigned Nb, unsigned Nr, const byte in[], word **w) {
 #ifdef DEBUG
-    printf("Input\n");
+    printf("InvCipher begins\n\n");
+    printf("InvCipher input\n");
     print_state(in);
 #endif
 
     byte *state = (byte *)malloc(4 * Nb * sizeof(byte));
     memcpy(state, in, 4 * Nb * sizeof(byte));
 
+#ifdef DEBUG
+    printf("InvCipher round %d\n\n", Nr);
+#endif
+
     AddRoundKey(Nb, state, w[Nr]);
 
     for (unsigned round = Nr - 1; round > 0; --round) {
 #ifdef DEBUG
-        printf("Round %d\n\n", round);
+        printf("InvCipher round %d\n\n", round);
 #endif
 
         InvShiftRows(Nb, state);
@@ -66,7 +73,7 @@ byte *InvCipher(unsigned Nb, unsigned Nr, const byte in[], word **w) {
     }
 
 #ifdef DEBUG
-    printf("Round 0\n\n");
+    printf("InvCipher round 0\n\n");
 #endif
 
     InvShiftRows(Nb, state);
@@ -74,8 +81,9 @@ byte *InvCipher(unsigned Nb, unsigned Nr, const byte in[], word **w) {
     AddRoundKey(Nb, state, w[0]);
 
 #ifdef DEBUG
-    printf("Output\n");
+    printf("InvCipher output\n");
     print_state(state);
+    printf("InvCipher ends\n\n");
 #endif
 
     return state;

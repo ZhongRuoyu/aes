@@ -5,8 +5,6 @@
 
 #include "aes.h"
 
-#define DEBUG  // comment this out when finished
-
 static void print_state(const byte *state) {
     for (unsigned i = 0; i < 4; ++i) {
         for (unsigned j = 0; j < 4; ++j) {
