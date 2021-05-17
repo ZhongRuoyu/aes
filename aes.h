@@ -11,13 +11,15 @@ typedef uint8_t bit;
 
 /* bits.c begin */
 
-byte *to_bytes(unsigned Nb, const word w[]);
+byte *to_bytes(word w);
+word to_word(byte b3, byte b2, byte b1, byte b0);
+byte *to_bytes_array(unsigned Nb, const word w[]);
 
 /* end bits.c */
 
 /* cipher.c begin */
 
-byte *cipher(unsigned Nb, unsigned Nr, byte in[], word w[][4]);
+byte *cipher(unsigned Nb, unsigned Nr, byte in[], word **w);
 void SubBytes(unsigned Nb, byte state[]);
 void ShiftRows(unsigned Nb, byte state[]);
 void MixColumns(unsigned Nb, byte state[]);
@@ -30,5 +32,14 @@ void AddRoundKey(unsigned Nb, byte state[], word w[]);
 byte multiply(byte a, byte b);
 
 /* end galois.c */
+
+/* key.c begin */
+
+word *KeyExpansion(unsigned Nb, unsigned Nr, const word key[], unsigned Nk);
+word SubWord(word w);
+word RotWord(word w);
+word **wrap_key(unsigned Nb, unsigned Nr, const word *w, unsigned Nk);
+
+/* end key.c */
 
 #endif  // AES_H_
