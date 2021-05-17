@@ -19,11 +19,11 @@ byte *to_bytes_array(unsigned Nb, const word w[]);
 
 /* cipher.c begin */
 
-byte *cipher(unsigned Nb, unsigned Nr, byte in[], word **w);
+byte *cipher(unsigned Nb, unsigned Nr, const byte in[], word **w);
 void SubBytes(unsigned Nb, byte state[]);
 void ShiftRows(unsigned Nb, byte state[]);
 void MixColumns(unsigned Nb, byte state[]);
-void AddRoundKey(unsigned Nb, byte state[], word w[]);
+void AddRoundKey(unsigned Nb, byte state[], const word w[]);
 
 /* end cipher.c */
 

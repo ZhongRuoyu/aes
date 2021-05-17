@@ -5,7 +5,7 @@
 #include "debug.h"
 #include "lookup.h"
 
-byte *cipher(unsigned Nb, unsigned Nr, byte in[], word **w) {
+byte *cipher(unsigned Nb, unsigned Nr, const byte in[], word **w) {
 #ifdef DEBUG
     printf("Input\n");
     print_state(in);
@@ -107,7 +107,7 @@ void MixColumns(unsigned Nb, byte state[]) {
 #endif
 }
 
-void AddRoundKey(unsigned Nb, byte state[], word w[]) {
+void AddRoundKey(unsigned Nb, byte state[], const word w[]) {
     byte *bytes = to_bytes_array(Nb, w);
 
 #ifdef DEBUG
