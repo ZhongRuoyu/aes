@@ -1,7 +1,7 @@
 #ifndef AES_H_
 #define AES_H_
 
-#include <stdint.h>  // for uintN_t
+#include <stdint.h>
 
 typedef uint8_t byte;
 typedef uint16_t dbyte;

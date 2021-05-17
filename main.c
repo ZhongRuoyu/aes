@@ -1,5 +1,5 @@
-#include <stdio.h>   // for printf
-#include <stdlib.h>  // for free
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "aes.h"
 #include "debug.h"

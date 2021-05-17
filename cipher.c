@@ -1,5 +1,5 @@
-#include <stdlib.h>  // for malloc
-#include <string.h>  // for memcpy
+#include <stdlib.h>
+#include <string.h>
 
 #include "aes.h"
 #include "debug.h"

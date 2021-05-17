@@ -1,4 +1,4 @@
-#include <stdlib.h>  // for malloc
+#include <stdlib.h>
 
 #include "aes.h"
 

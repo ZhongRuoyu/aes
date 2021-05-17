@@ -1,7 +1,7 @@
 #ifndef DEBUG_H_
 #define DEBUG_H_
 
-#include <stdio.h>  // for printf
+#include <stdio.h>
 
 #include "aes.h"
 
