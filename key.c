@@ -24,17 +24,5 @@ word *KeyExpansion(unsigned Nb, unsigned Nr, const word key[], unsigned Nk) {
         w[i] = w[i - Nk] ^ temp;
     }
 
-#ifdef DEBUG
-    printf("Key Expansion\n");
-    for (unsigned i = 0; i < Nr + 1; ++i) {
-        printf("%2d ", i);
-        for (unsigned j = 0; j < Nb; ++j) {
-            printf("%8x ", w[i * Nb + j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-#endif
-
     return w;
 }

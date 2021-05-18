@@ -5,9 +5,11 @@
 
 int main(int argc, char **argv) {
     const unsigned Nk = 4, Nr = 10, Nb = 4;
-    const char *key = "2b7e1516 28aed2a6 abf71588 09cf4f3c";
-    const char *in = "3243f6a8885a308d313198a2e0370734";
+    const char *key = "000102030405060708090a0b0c0d0e0f";
+    const char *in = "00112233445566778899aabbccddeeff";
     char *out = cipher_hex(Nk, key, in);
-    print_multiline(out, '\n');
+    char *dec = inv_cipher_hex(Nk, key, out);
+    print_multiline(dec, '\n');
+    free(dec);
     free(out);
 }
