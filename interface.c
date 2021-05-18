@@ -54,7 +54,7 @@ char *inv_cipher_hex(unsigned Nk, const char *key, const char *in) {
     return out;
 }
 
-char *cipher_hex_multiline(unsigned Nk, const char *key, const char *in) {
+char *cipher_hex_multiblock(unsigned Nk, const char *key, const char *in) {
     unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
     word **key_processed = process_key(Nb, Nr, key, Nk);
 
@@ -74,7 +74,7 @@ char *cipher_hex_multiline(unsigned Nk, const char *key, const char *in) {
     return out;
 }
 
-char *inv_cipher_hex_multiline(unsigned Nk, const char *key, const char *in) {
+char *inv_cipher_hex_multiblock(unsigned Nk, const char *key, const char *in) {
     unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
     word **key_processed = process_key(Nb, Nr, key, Nk);
 

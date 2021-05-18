@@ -9,8 +9,8 @@ int main(int argc, char **argv) {
     const char *in =
         "00112233445566778899aabbccddeeff"
         "ffeeddccbbaa99887766554433221100";
-    char *out = cipher_hex_multiline(Nk, key, in);
-    char *dec = inv_cipher_hex_multiline(Nk, key, out);
+    char *out = cipher_hex_multiblock(Nk, key, in);
+    char *dec = inv_cipher_hex_multiblock(Nk, key, out);
     print_multiline(dec, '\n');
     free(dec);
     free(out);
