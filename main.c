@@ -128,7 +128,6 @@ int main(int argc, const char **argv) {
     if (key_mode == UNDEFINED) error("The key mode is not specified.");
 
     if (key_mode == KEY_FILE) {
-        error("Mode not implemented yet.");
         key = read_from_key_file(key_dir);
     }
     char *key_processed = process_hex_string(key);
