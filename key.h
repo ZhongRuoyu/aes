@@ -8,7 +8,8 @@
 
 static word SubWord(word w);
 static word RotWord(word w);
-static word **wrap_key(unsigned Nb, unsigned Nr, const word *w, unsigned Nk);
+
+static word **wrap_key(unsigned Nb, unsigned Nr, const word w[], unsigned Nk);
 
 static word SubWord(word in) {
     byte *bytes = to_bytes(in);
@@ -24,7 +25,7 @@ static word RotWord(word w) {
     return (w << 8) | (w >> 24);
 }
 
-static word **wrap_key(unsigned Nb, unsigned Nr, const word *w, unsigned Nk) {
+static word **wrap_key(unsigned Nb, unsigned Nr, const word w[], unsigned Nk) {
     word **out = (word **)malloc((Nr + 1) * sizeof(const word *));
     for (unsigned i = 0; i < Nr + 1; ++i) {
         out[i] = (word *)malloc(Nb * sizeof(word));

@@ -16,6 +16,7 @@ static inline unsigned get_Nb();
 static inline unsigned get_Nr(unsigned Nk);
 
 static char *cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, word **key, byte **in, unsigned block_count);
+static char *inv_cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, word **key, byte **in, unsigned block_count);
 
 static word **process_key(unsigned Nb, unsigned Nr, const char *key, unsigned Nk);
 
@@ -23,14 +24,14 @@ static char *process_hex_string(const char *str);
 
 // ISO/IEC 9797-1, padding method 2
 static char *string_bit_padding(char *str);
-int remove_string_bit_padding(char *str);
-int get_block_bit_padding_position(unsigned Nb, byte *block);
+static int remove_string_bit_padding(char *str);
+static int get_block_bit_padding_position(unsigned Nb, byte block[]);
 
 static word *hex_string_to_key(unsigned Nk, const char *str);
 static byte *hex_string_to_block(const char *str);
 static byte **hex_string_to_blocks(char *str, unsigned block_count);
 
-static char *block_to_string(unsigned Nb, byte *block);
+static char *block_to_string(unsigned Nb, byte block[]);
 
 static void error(const char *msg) {
     fprintf(stderr, "Error: %s\n\n", msg);
@@ -120,7 +121,7 @@ static char *string_bit_padding(char *str) {
     return new_str;
 }
 
-int remove_string_bit_padding(char *str) {
+static int remove_string_bit_padding(char *str) {
     const unsigned n = strlen(str);
     for (signed i = n - 1; i >= 0; --i) {
         if (str[i] != '0') {
@@ -132,7 +133,7 @@ int remove_string_bit_padding(char *str) {
     return 1;
 }
 
-int get_block_bit_padding_position(unsigned Nb, byte *block) {
+static int get_block_bit_padding_position(unsigned Nb, byte block[]) {
     for (signed i = 4 * Nb - 1; i >= 0; --i) {
         if (block[i] != 0x00) {
             if (block[i] != 0x80) return -1;
@@ -174,7 +175,7 @@ static byte **hex_string_to_blocks(char *str, unsigned block_count) {
     return blocks;
 }
 
-static char *block_to_string(unsigned Nb, byte *block) {
+static char *block_to_string(unsigned Nb, byte block[]) {
     char *str = (char *)malloc((8 * Nb + 1) * sizeof(char));
     for (unsigned j = 0; j < Nb; ++j) {
         for (unsigned i = 0; i < 4; ++i) {

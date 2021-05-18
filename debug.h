@@ -6,7 +6,9 @@
 
 #include "aes.h"
 
-static void print_block(unsigned Nb, const byte *block) {
+static void print_block(unsigned Nb, const byte block[]);
+
+static void print_block(unsigned Nb, const byte block[]) {
     for (unsigned j = 0; j < Nb; ++j) {
         for (unsigned i = 0; i < 4; ++i) {
             char buffer[3];
