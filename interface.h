@@ -12,7 +12,7 @@
 
 static void error(const char *msg);
 
-static inline unsigned get_Nb(unsigned Nk);
+static inline unsigned get_Nb();
 static inline unsigned get_Nr(unsigned Nk);
 
 static char *cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, word **key, byte **in, unsigned block_count);
@@ -37,7 +37,7 @@ static void error(const char *msg) {
     exit(EXIT_FAILURE);
 }
 
-static inline unsigned get_Nb(unsigned Nk) {
+static inline unsigned get_Nb() {
     return 4;
 }
 

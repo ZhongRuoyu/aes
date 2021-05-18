@@ -9,7 +9,7 @@
 #include "strings.h"
 
 char *cipher_hex(unsigned Nk, const char *key, const char *in) {
-    unsigned Nb = get_Nb(Nk), Nr = get_Nr(Nk);
+    unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
     word **key_processed = process_key(Nb, Nr, key, Nk);
 
     char *in_processed = process_hex_string(in);
@@ -32,7 +32,7 @@ char *cipher_hex(unsigned Nk, const char *key, const char *in) {
 }
 
 char *inv_cipher_hex(unsigned Nk, const char *key, const char *in) {
-    unsigned Nb = get_Nb(Nk), Nr = get_Nr(Nk);
+    unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
     word **key_processed = process_key(Nb, Nr, key, Nk);
 
     char *in_processed = process_hex_string(in);
@@ -55,7 +55,7 @@ char *inv_cipher_hex(unsigned Nk, const char *key, const char *in) {
 }
 
 char *cipher_hex_multiline(unsigned Nk, const char *key, const char *in) {
-    unsigned Nb = get_Nb(Nk), Nr = get_Nr(Nk);
+    unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
     word **key_processed = process_key(Nb, Nr, key, Nk);
 
     char *in_processed = process_hex_string(in);
@@ -75,7 +75,7 @@ char *cipher_hex_multiline(unsigned Nk, const char *key, const char *in) {
 }
 
 char *inv_cipher_hex_multiline(unsigned Nk, const char *key, const char *in) {
-    unsigned Nb = get_Nb(Nk), Nr = get_Nr(Nk);
+    unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
     word **key_processed = process_key(Nb, Nr, key, Nk);
 
     char *in_processed = process_hex_string(in);
@@ -105,7 +105,7 @@ char *inv_cipher_hex_multiline(unsigned Nk, const char *key, const char *in) {
 }
 
 void cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *out_dir) {
-    unsigned Nb = get_Nb(Nk), Nr = get_Nr(Nk);
+    unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
     word **key_processed = process_key(Nb, Nr, key, Nk);
 
     FILE *in_file, *out_file;
@@ -149,7 +149,7 @@ void cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *o
 }
 
 void inv_cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *out_dir) {
-    unsigned Nb = get_Nb(Nk), Nr = get_Nr(Nk);
+    unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
     word **key_processed = process_key(Nb, Nr, key, Nk);
 
     FILE *in_file, *out_file;
