@@ -6,13 +6,13 @@
 typedef uint8_t byte;
 typedef uint32_t word;
 
-/* bits.c begin */
+/* bytes.c begin */
 
 byte *to_bytes(word w);
 word to_word(byte b3, byte b2, byte b1, byte b0);
 byte *to_bytes_array(unsigned Nb, const word w[]);
 
-/* end bits.c */
+/* end bytes.c */
 
 /* cipher.c begin */
 
