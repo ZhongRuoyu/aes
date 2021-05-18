@@ -37,6 +37,15 @@ byte multiply(byte a, byte b);
 
 /* end galois.c */
 
+/* interface.c begin */
+
+char *cipher_hex(unsigned Nk, const char *key, const char *in);
+char *inv_cipher_hex(unsigned Nk, const char *key, const char *in);
+char *cipher_hex_multiline(unsigned Nk, const char *key, const char *in);
+char *inv_cipher_hex_multiline(unsigned Nk, const char *key, const char *in);
+
+/* end interface.c */
+
 /* key.c begin */
 
 word *KeyExpansion(unsigned Nb, unsigned Nr, const word key[], unsigned Nk);
