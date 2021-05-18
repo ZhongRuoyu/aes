@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include "aes.h"
 
@@ -23,4 +24,14 @@ byte *to_bytes_array(unsigned Nb, const word w[]) {
         }
     }
     return bytes;
+}
+
+void transpose_block(unsigned Nb, byte block[]) {
+    byte *new_block = (byte *)malloc(4 * Nb * sizeof(byte));
+    for (unsigned pos = 0, i = 0, j = 0; pos < 4 * Nb; ++pos) {
+        new_block[i * Nb + j] = block[pos];
+        if (++j == 4) j = 0, ++i;
+    }
+    memcpy(block, new_block, 4 * Nb * sizeof(byte));
+    free(new_block);
 }

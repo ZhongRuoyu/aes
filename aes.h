@@ -11,6 +11,7 @@ typedef uint32_t word;
 byte *to_bytes(word w);
 word to_word(byte b3, byte b2, byte b1, byte b0);
 byte *to_bytes_array(unsigned Nb, const word w[]);
+void transpose_block(unsigned Nb, byte block[]);
 
 /* end bytes.c */
 

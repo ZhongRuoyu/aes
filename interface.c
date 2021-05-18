@@ -120,6 +120,7 @@ void cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *o
     byte *buffer = (byte *)malloc(4 * Nb * sizeof(byte));
     unsigned bytes_read;
     while ((bytes_read = fread(buffer, sizeof(byte), 4 * Nb, in_file)) == 4 * Nb) {
+        transpose_block(Nb, buffer);
         byte *out_buffer = Cipher(Nb, Nr, buffer, key_processed);
         fwrite(out_buffer, sizeof(byte), 4 * Nb, out_file);
         free(out_buffer);
@@ -134,6 +135,7 @@ void cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *o
             buffer[i] = 0x00;
         }
     }
+    transpose_block(Nb, buffer);
     byte *out_buffer = Cipher(Nb, Nr, buffer, key_processed);
     fwrite(out_buffer, sizeof(byte), 4 * Nb, out_file);
     free(out_buffer);
@@ -175,11 +177,13 @@ void inv_cipher_file(unsigned Nk, const char *key, const char *in_dir, const cha
     byte *buffer = (byte *)malloc(4 * Nb * sizeof(byte));
     for (unsigned bytes_read = 0; (bytes_read + 4 * Nb) < file_size;) {
         bytes_read += fread(buffer, sizeof(byte), 4 * Nb, in_file);
+        transpose_block(Nb, buffer);
         byte *out_buffer = InvCipher(Nb, Nr, buffer, key_processed);
         fwrite(out_buffer, sizeof(byte), 4 * Nb, out_file);
         free(out_buffer);
     }
     fread(buffer, sizeof(byte), 4 * Nb, in_file);
+    transpose_block(Nb, buffer);
     byte *out_buffer = InvCipher(Nb, Nr, buffer, key_processed);
 
     int pos = get_block_bit_padding_position(Nb, out_buffer);
