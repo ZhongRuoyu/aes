@@ -1,6 +1,9 @@
+#ifndef GALOIS_H_
+#define GALOIS_H_
+
 #include "aes.h"
 
-byte multiply(byte a, byte b) {
+static byte multiply(byte a, byte b) {
     byte res = 0;
     for (; b; b >>= 1) {
         if (b & 1) res ^= a;
@@ -8,3 +11,5 @@ byte multiply(byte a, byte b) {
     }
     return res;
 }
+
+#endif  // GALOIS_H_

@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "aes.h"
+#include "key.h"
 #include "strings.h"
 
 static void error(const char *msg);
@@ -120,7 +121,7 @@ static char *string_bit_padding(char *str) {
 // ISO/IEC 9797-1, padding method 2
 int remove_string_bit_padding(char *str) {
     const unsigned n = strlen(str);
-    for (signed i = n - 1; i >= 0 ; --i) {
+    for (signed i = n - 1; i >= 0; --i) {
         if (str[i] != '0') {
             if (str[i] != '8') return 1;
             str[i] = '\0';
