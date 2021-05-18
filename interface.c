@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "aes.h"
+#include "io.h"
 #include "interface.h"
 #include "strings.h"
 

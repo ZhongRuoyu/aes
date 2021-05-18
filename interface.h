@@ -10,8 +10,6 @@
 #include "key.h"
 #include "strings.h"
 
-static void error(const char *msg);
-
 static inline unsigned get_Nb();
 static inline unsigned get_Nr(unsigned Nk);
 
@@ -32,11 +30,6 @@ static byte *hex_string_to_block(const char *str);
 static byte **hex_string_to_blocks(char *str, unsigned block_count);
 
 static char *block_to_string(unsigned Nb, byte block[]);
-
-static void error(const char *msg) {
-    fprintf(stderr, "Error: %s\n\n", msg);
-    exit(EXIT_FAILURE);
-}
 
 static inline unsigned get_Nb() {
     return 4;
