@@ -4,10 +4,7 @@
 #include <stdint.h>
 
 typedef uint8_t byte;
-typedef uint16_t dbyte;
 typedef uint32_t word;
-
-typedef uint8_t bit;
 
 /* bits.c begin */
 
