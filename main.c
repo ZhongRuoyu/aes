@@ -187,7 +187,7 @@ static const char *read_from_key_file(const char *filename) {
     unsigned file_size = ftell(file);
     rewind(file);
     char *out = (char *)malloc((file_size + 1) * sizeof(char));
-    fread(out, sizeof(char), file_size, file);
-    out[file_size] = '\0';
+    unsigned end = fread(out, sizeof(char), file_size, file);
+    out[end] = '\0';
     return out;
 }
