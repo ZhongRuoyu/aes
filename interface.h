@@ -20,8 +20,11 @@ static char *cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, word **
 static word **process_key(unsigned Nb, unsigned Nr, const char *key, unsigned Nk);
 
 static char *process_hex_string(const char *str);
+
+// ISO/IEC 9797-1, padding method 2
 static char *string_bit_padding(char *str);
 int remove_string_bit_padding(char *str);
+int get_block_bit_padding_position(unsigned Nb, byte *block);
 
 static word *hex_string_to_key(unsigned Nk, const char *str);
 static byte *hex_string_to_block(const char *str);
@@ -107,7 +110,6 @@ static char *process_hex_string(const char *str) {
     return new_str;
 }
 
-// ISO/IEC 9797-1, padding method 2
 static char *string_bit_padding(char *str) {
     const unsigned n = strlen(str);
     unsigned padded_length = ((n / 32) + 1) * 32;
@@ -118,7 +120,6 @@ static char *string_bit_padding(char *str) {
     return new_str;
 }
 
-// ISO/IEC 9797-1, padding method 2
 int remove_string_bit_padding(char *str) {
     const unsigned n = strlen(str);
     for (signed i = n - 1; i >= 0; --i) {
@@ -129,6 +130,16 @@ int remove_string_bit_padding(char *str) {
         }
     }
     return 1;
+}
+
+int get_block_bit_padding_position(unsigned Nb, byte *block) {
+    for (signed i = 4 * Nb - 1; i >= 0; --i) {
+        if (block[i] != 0x00) {
+            if (block[i] != 0x80) return -1;
+            return i;
+        }
+    }
+    return -1;
 }
 
 static word *hex_string_to_key(unsigned Nk, const char *str) {

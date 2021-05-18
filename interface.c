@@ -1,5 +1,6 @@
 #include "interface.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -101,4 +102,104 @@ char *inv_cipher_hex_multiline(unsigned Nk, const char *key, const char *in) {
     }
 
     return out;
+}
+
+void cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *out_dir) {
+    unsigned Nb = get_Nb(Nk), Nr = get_Nr(Nk);
+    word **key_processed = process_key(Nb, Nr, key, Nk);
+
+    FILE *in_file, *out_file;
+    if (fopen_s(&in_file, in_dir, "rb")) {
+        error("Failed to open input file.");
+    }
+    if (fopen_s(&out_file, out_dir, "wb")) {
+        fclose(in_file);
+        error("Failed to create output file.");
+    }
+
+    byte *buffer = (byte *)malloc(4 * Nb * sizeof(byte));
+    unsigned bytes_read;
+    while ((bytes_read = fread(buffer, sizeof(byte), 4 * Nb, in_file)) == 4 * Nb) {
+        byte *out_buffer = Cipher(Nb, Nr, buffer, key_processed);
+        fwrite(out_buffer, sizeof(byte), 4 * Nb, out_file);
+        free(out_buffer);
+    }
+
+    if (bytes_read == 4 * Nb) {
+        memset(buffer, 0x00, 4 * Nb * sizeof(byte));
+        buffer[0] = 0x80;
+    } else {
+        buffer[bytes_read] = 0x80;
+        for (unsigned i = bytes_read + 1; i < 4 * Nb; ++i) {
+            buffer[i] = 0x00;
+        }
+    }
+    byte *out_buffer = Cipher(Nb, Nr, buffer, key_processed);
+    fwrite(out_buffer, sizeof(byte), 4 * Nb, out_file);
+    free(out_buffer);
+
+    free(buffer);
+    for (unsigned i = 0; i < Nr + 1; ++i) free(key_processed[i]);
+    free(key_processed);
+
+    fclose(in_file);
+    fclose(out_file);
+}
+
+void inv_cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *out_dir) {
+    unsigned Nb = get_Nb(Nk), Nr = get_Nr(Nk);
+    word **key_processed = process_key(Nb, Nr, key, Nk);
+
+    FILE *in_file, *out_file;
+    if (fopen_s(&in_file, in_dir, "rb")) {
+        error("Failed to open input file.");
+    }
+    if (fopen_s(&out_file, out_dir, "wb")) {
+        fclose(in_file);
+        error("Failed to create output file.");
+    }
+
+    fseek(in_file, 0, SEEK_END);
+    unsigned file_size = ftell(in_file);
+    rewind(in_file);
+
+    if (file_size == 0 || file_size % (4 * Nb)) {
+        for (unsigned i = 0; i < Nr + 1; ++i) free(key_processed[i]);
+        free(key_processed);
+        fclose(in_file);
+        fclose(out_file);
+        remove(out_dir);
+        error("Incorrect input file. Is it empty or modified?");
+    }
+
+    byte *buffer = (byte *)malloc(4 * Nb * sizeof(byte));
+    for (unsigned bytes_read = 0; (bytes_read + 4 * Nb) < file_size;) {
+        bytes_read += fread(buffer, sizeof(byte), 4 * Nb, in_file);
+        byte *out_buffer = InvCipher(Nb, Nr, buffer, key_processed);
+        fwrite(out_buffer, sizeof(byte), 4 * Nb, out_file);
+        free(out_buffer);
+    }
+    fread(buffer, sizeof(byte), 4 * Nb, in_file);
+    byte *out_buffer = InvCipher(Nb, Nr, buffer, key_processed);
+
+    int pos = get_block_bit_padding_position(Nb, out_buffer);
+    if (pos < 0) {
+        free(buffer);
+        free(out_buffer);
+        for (unsigned i = 0; i < Nr + 1; ++i) free(key_processed[i]);
+        free(key_processed);
+        fclose(in_file);
+        fclose(out_file);
+        remove(out_dir);
+        error("Could not correctly interpret input.");
+    }
+    fwrite(out_buffer, sizeof(byte), pos, out_file);
+    free(out_buffer);
+
+    free(buffer);
+    for (unsigned i = 0; i < Nr + 1; ++i) free(key_processed[i]);
+    free(key_processed);
+
+    fclose(in_file);
+    fclose(out_file);
 }

@@ -25,8 +25,12 @@ byte *InvCipher(unsigned Nb, unsigned Nr, const byte in[], word **w);
 
 char *cipher_hex(unsigned Nk, const char *key, const char *in);
 char *inv_cipher_hex(unsigned Nk, const char *key, const char *in);
+
 char *cipher_hex_multiline(unsigned Nk, const char *key, const char *in);
 char *inv_cipher_hex_multiline(unsigned Nk, const char *key, const char *in);
+
+void cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *out_dir);
+void inv_cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *out_dir);
 
 /* end interface.c */
 
