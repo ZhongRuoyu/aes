@@ -19,8 +19,6 @@ static char *inv_cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, wor
 
 static word **process_key(unsigned Nb, unsigned Nr, const char *key, unsigned Nk);
 
-static char *process_hex_string(const char *str);
-
 // ISO/IEC 9797-1, padding method 2
 static char *string_bit_padding(char *str);
 static int remove_string_bit_padding(char *str);
@@ -87,22 +85,6 @@ static word **process_key(unsigned Nb, unsigned Nr, const char *key, unsigned Nk
     word **key_processed = wrap_key(Nb, Nr, key_expanded, Nk);
     free(key_expanded);
     return key_processed;
-}
-
-static char *process_hex_string(const char *str) {
-    const int str_len = strlen(str);
-    char *new_str = (char *)malloc((str_len + 1) * sizeof(char));
-    unsigned n = 0;
-    for (unsigned i = 0; i < str_len; ++i) {
-        if (isspace(str[i])) continue;
-        if (!isxdigit(str[i])) {
-            free(new_str);
-            error("Input contains invalid hexadecimal digit.");
-        }
-        new_str[n++] = str[i];
-    }
-    new_str[n] = '\0';
-    return new_str;
 }
 
 static char *string_bit_padding(char *str) {

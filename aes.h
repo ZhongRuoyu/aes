@@ -6,6 +6,12 @@
 typedef uint8_t byte;
 typedef uint32_t word;
 
+typedef enum Mode {
+    UNDEFINED,
+    CIPHER,
+    INVCIPHER,
+} Mode;
+
 /* bytes.c begin */
 
 byte *to_bytes(word w);
@@ -32,6 +38,8 @@ char *inv_cipher_hex_multiblock(unsigned Nk, const char *key, const char *in);
 
 void cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *out_dir);
 void inv_cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *out_dir);
+
+char *process_hex_string(const char *str);
 
 /* end interface.c */
 

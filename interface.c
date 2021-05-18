@@ -208,3 +208,19 @@ void inv_cipher_file(unsigned Nk, const char *key, const char *in_dir, const cha
     fclose(in_file);
     fclose(out_file);
 }
+
+char *process_hex_string(const char *str) {
+    const int str_len = strlen(str);
+    char *new_str = (char *)malloc((str_len + 1) * sizeof(char));
+    unsigned n = 0;
+    for (unsigned i = 0; i < str_len; ++i) {
+        if (isspace(str[i])) continue;
+        if (!isxdigit(str[i])) {
+            free(new_str);
+            error("Input contains invalid hexadecimal digit.");
+        }
+        new_str[n++] = str[i];
+    }
+    new_str[n] = '\0';
+    return new_str;
+}
