@@ -27,6 +27,7 @@ int main(int argc, char **argv) {
     printf("Decrypted:\n");
     print_state(dec);
 
+    for (unsigned i = 0; i < Nr + 1; ++i) free(key[i]);
     free(key);
     free(enc);
     free(dec);
