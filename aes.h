@@ -12,6 +12,12 @@ typedef enum Mode {
     INVCIPHER,
 } Mode;
 
+/* main.c begin */
+
+extern int verbose;
+
+/* end main.c */
+
 /* bytes.c begin */
 
 byte *to_bytes(word w);

@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 #include "aes.h"
-#include "debug.h"
+#include "io.h"
 #include "lookup.h"
 
 word *KeyExpansion(unsigned Nb, unsigned Nr, const word key[], unsigned Nk) {
