@@ -30,7 +30,7 @@ static word *hex_string_to_key(unsigned Nk, const char *str);
 static byte *hex_string_to_block(const char *str);
 static byte **hex_string_to_blocks(char *str, unsigned block_count);
 
-static char *state_to_string(unsigned Nb, byte *block);
+static char *block_to_string(unsigned Nb, byte *block);
 
 static void error(const char *msg) {
     fprintf(stderr, "Error: %s\n\n", msg);
@@ -57,7 +57,7 @@ static char *cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, word **
     char *out = (char *)malloc((block_count * 32 + 1) * sizeof(char));
     for (unsigned i = 0; i < block_count; ++i) {
         byte *out_bytes = Cipher(Nb, Nr, in[i], key);
-        char *out_str = state_to_string(Nb, out_bytes);
+        char *out_str = block_to_string(Nb, out_bytes);
         free(out_bytes);
         string_copy(out + i * 32, out_str, 32);
         free(out_str);
@@ -70,7 +70,7 @@ static char *inv_cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, wor
     char *out = (char *)malloc((block_count * 32 + 1) * sizeof(char));
     for (unsigned i = 0; i < block_count; ++i) {
         byte *out_bytes = InvCipher(Nb, Nr, in[i], key);
-        char *out_str = state_to_string(Nb, out_bytes);
+        char *out_str = block_to_string(Nb, out_bytes);
         free(out_bytes);
         string_copy(out + i * 32, out_str, 32);
         free(out_str);
@@ -174,7 +174,7 @@ static byte **hex_string_to_blocks(char *str, unsigned block_count) {
     return blocks;
 }
 
-static char *state_to_string(unsigned Nb, byte *block) {
+static char *block_to_string(unsigned Nb, byte *block) {
     char *str = (char *)malloc((8 * Nb + 1) * sizeof(char));
     for (unsigned j = 0; j < Nb; ++j) {
         for (unsigned i = 0; i < 4; ++i) {
