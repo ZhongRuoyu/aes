@@ -7,8 +7,8 @@
 
 #include "aes.h"
 
-void error(const char *msg) {
-    fprintf(stderr, "Error: %s\n\n", msg);
+void error(const char *msg, const char *from) {
+    fprintf(stderr, "Error: %s%s\n\n", from ? from : "", msg);
     exit(EXIT_FAILURE);
 }
 

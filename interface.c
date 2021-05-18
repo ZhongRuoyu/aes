@@ -17,7 +17,7 @@ char *cipher_hex(unsigned Nk, const char *key, const char *in) {
     if (strlen(in_processed) != 32) {
         for (unsigned i = 0; i < Nr + 1; ++i) free(key_processed[i]);
         free(key_processed);
-        error("Incorrect input length.");
+        error("Incorrect input length.", NULL);
     }
     byte **in_blocks = hex_string_to_blocks(in_processed, 1);
     free(in_processed);
@@ -40,7 +40,7 @@ char *inv_cipher_hex(unsigned Nk, const char *key, const char *in) {
     if (strlen(in_processed) != 32) {
         for (unsigned i = 0; i < Nr + 1; ++i) free(key_processed[i]);
         free(key_processed);
-        error("Incorrect input length.");
+        error("Incorrect input length.", NULL);
     }
     byte **in_blocks = hex_string_to_blocks(in_processed, 1);
     free(in_processed);
@@ -84,7 +84,7 @@ char *inv_cipher_hex_multiblock(unsigned Nk, const char *key, const char *in) {
     if (n % 32) {
         for (unsigned i = 0; i < Nr + 1; ++i) free(key_processed[i]);
         free(key_processed);
-        error("Incorrect input length.");
+        error("Incorrect input length.", NULL);
     }
     const unsigned block_count = n / 32;
     byte **in_blocks = hex_string_to_blocks(in_processed, block_count);
@@ -99,7 +99,7 @@ char *inv_cipher_hex_multiblock(unsigned Nk, const char *key, const char *in) {
 
     if (remove_string_bit_padding(out)) {
         free(out);
-        error("Could not correctly interpret input.");
+        error("Could not correctly interpret input.", NULL);
     }
 
     return out;
@@ -111,11 +111,11 @@ void cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *o
 
     FILE *in_file, *out_file;
     if (fopen_s(&in_file, in_dir, "rb")) {
-        error("Failed to open input file.");
+        error(": Failed to open input file.", in_dir);
     }
     if (fopen_s(&out_file, out_dir, "wb")) {
         fclose(in_file);
-        error("Failed to create output file.");
+        error(": Failed to open output file.", out_dir);
     }
 
     byte *buffer = (byte *)malloc(4 * Nb * sizeof(byte));
@@ -155,11 +155,11 @@ void inv_cipher_file(unsigned Nk, const char *key, const char *in_dir, const cha
 
     FILE *in_file, *out_file;
     if (fopen_s(&in_file, in_dir, "rb")) {
-        error("Failed to open input file.");
+        error(": Failed to open input file.", in_dir);
     }
     if (fopen_s(&out_file, out_dir, "wb")) {
         fclose(in_file);
-        error("Failed to create output file.");
+        error(": Failed to open output file.", out_dir);
     }
 
     fseek(in_file, 0, SEEK_END);
@@ -172,7 +172,7 @@ void inv_cipher_file(unsigned Nk, const char *key, const char *in_dir, const cha
         fclose(in_file);
         fclose(out_file);
         remove(out_dir);
-        error("Incorrect input file. Is it empty or modified?");
+        error(": Incorrect input file. Is it empty or modified?", in_dir);
     }
 
     byte *buffer = (byte *)malloc(4 * Nb * sizeof(byte));
@@ -196,7 +196,7 @@ void inv_cipher_file(unsigned Nk, const char *key, const char *in_dir, const cha
         fclose(in_file);
         fclose(out_file);
         remove(out_dir);
-        error("Could not correctly interpret input.");
+        error(": Could not correctly interpret input.", in_dir);
     }
     fwrite(out_buffer, sizeof(byte), pos, out_file);
     free(out_buffer);
@@ -217,7 +217,7 @@ char *process_hex_string(const char *str) {
         if (isspace(str[i])) continue;
         if (!isxdigit(str[i])) {
             free(new_str);
-            error("Input contains invalid hexadecimal digit.");
+            error("Input contains invalid hexadecimal digit.", NULL);
         }
         new_str[n++] = str[i];
     }
