@@ -8,7 +8,6 @@
 
 #include "aes.h"
 #include "io.h"
-#include "key.h"
 #include "strings.h"
 
 static inline unsigned get_Nb();
