@@ -10,6 +10,8 @@
 
 For byte padding for multi-block hexadecimal strings and files, `AES` uses the padding method 2 from [ISO/IEC 9797-1](https://en.wikipedia.org/wiki/ISO/IEC_9797-1).
 
+All the "flavours" of the algorithm, i.e. AES-128, AES-192, and AES-256, are supported. `AES` determines the algorithm by the length of the key provided.
+
 ## To Use
 
 Run `aes --help` to view the detailed help message on using `AES`.
