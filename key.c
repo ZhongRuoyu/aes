@@ -3,7 +3,6 @@
 
 #include "aes.h"
 #include "io.h"
-#include "lookup.h"
 
 static word SubWord(word w);
 static word RotWord(word w);

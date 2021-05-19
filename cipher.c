@@ -5,7 +5,6 @@
 #include "aes.h"
 #include "galois.h"
 #include "io.h"
-#include "lookup.h"
 
 static void SubBytes(unsigned Nb, byte state[]);
 static void InvSubBytes(unsigned Nb, byte state[]);

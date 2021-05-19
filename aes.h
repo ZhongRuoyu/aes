@@ -34,6 +34,16 @@ byte *InvCipher(unsigned Nb, unsigned Nr, const byte in[], word **w);
 
 /* end cipher.c */
 
+/* data.c begin */
+
+extern const word Rcon[];
+extern const byte MixColumns_multiplier[];
+extern const byte InvMixColumns_multiplier[];
+extern const byte s_box[];
+extern const byte inverse_s_box[];
+
+/* end data.c */
+
 /* interface.c begin */
 
 char *cipher_hex(unsigned Nk, const char *key, const char *in);
