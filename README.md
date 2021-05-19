@@ -28,7 +28,7 @@ aes -e -s "3243f6a8 885a308d 313198a2 e0370734" -k "2b7e1516 28aed2a6 abf71588 0
 
 ## To Build
 
-To build `AES`, include all the `*.c` files in the root directory. For instance, with `clang` on Ubuntu:
+To build `AES`, include all the source files in the root directory. For instance, with `clang` on Ubuntu:
 
 ```
 clang *.c -o aes
@@ -40,4 +40,4 @@ Copyright (c) 2021 Zhong Ruoyu.
 
 Licensed under the MIT license.
 
-For more information, see [`LICENSE`](/LICENSE).
+For more information, see [LICENSE](/LICENSE).
