@@ -54,7 +54,6 @@ char *process_hex_string(const char *str);
 word *KeyExpansion(unsigned Nb, unsigned Nr, const word key[], unsigned Nk);
 word **wrap_key(unsigned Nb, unsigned Nr, const word w[], unsigned Nk);
 
-
 /* end key.c */
 
 #endif  // AES_H_
