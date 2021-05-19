@@ -1,7 +1,10 @@
+#include <ctype.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "aes.h"
+#include "strings.h"
 
 byte *to_bytes(word w) {
     byte *bytes = (byte *)malloc(4 * sizeof(byte));
@@ -34,4 +37,18 @@ void transpose_block(unsigned Nb, byte block[]) {
     }
     memcpy(block, new_block, 4 * Nb * sizeof(byte));
     free(new_block);
+}
+
+char *block_to_string(unsigned Nb, byte block[]) {
+    char *str = (char *)malloc((8 * Nb + 1) * sizeof(char));
+    for (unsigned j = 0; j < Nb; ++j) {
+        for (unsigned i = 0; i < 4; ++i) {
+            char buffer[3];
+            snprintf(buffer, 3, "%2x", block[i * Nb + j]);
+            if (isspace(buffer[0])) buffer[0] = '0';
+            string_copy(str + j * 8 + i * 2, buffer, 2);
+        }
+    }
+    str[8 * Nb] = '\0';
+    return str;
 }
