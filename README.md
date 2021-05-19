@@ -2,8 +2,6 @@
 
 `AES` is an implementation of the [Advanced Encryption Standard (AES)](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard) in C, in accordance with the [Standard](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf) published in 2001.
 
-`AES`
-
 ## To Use
 
 Run `aes --help` to view the detailed help message.
