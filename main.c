@@ -1,3 +1,6 @@
+// disables deprecation warning for fopen
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -85,7 +88,7 @@ int main(int argc, const char **argv) {
             if (mode != UNDEFINED) error("Only one cipher mode can be specified.", NULL);
             mode = INVCIPHER;
         } else if (strcmp(argv[i], "-v") == 0) {
-            if (verbose == 1) error("-v can only be specified once.", NULL);
+            if (verbose != 0) error("-v can only be specified once.", NULL);
             verbose = 1;
         } else if (strcmp(argv[i], "-s") == 0) {
             if (input_mode != INPUT_UNDEFINED) error("Only one input mode can be specified.", NULL);
@@ -180,7 +183,7 @@ int main(int argc, const char **argv) {
 
 static const char *read_from_key_file(const char *filename) {
     FILE *file;
-    if (fopen_s(&file, filename, "r")) {
+    if (!(file = fopen(filename, "r"))) {
         error(": Failed to open key file.", filename);
     }
     fseek(file, 0, SEEK_END);

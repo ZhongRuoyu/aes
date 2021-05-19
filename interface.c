@@ -1,3 +1,6 @@
+// disables deprecation warning for fopen and strncpy
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "interface.h"
 
 #include <stdio.h>
@@ -110,10 +113,10 @@ void cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *o
     word **key_processed = process_key(Nb, Nr, key, Nk);
 
     FILE *in_file, *out_file;
-    if (fopen_s(&in_file, in_dir, "rb")) {
+    if (!(in_file = fopen(in_dir, "rb"))) {
         error(": Failed to open input file.", in_dir);
     }
-    if (fopen_s(&out_file, out_dir, "wb")) {
+    if (!(out_file = fopen(out_dir, "wb"))) {
         fclose(in_file);
         error(": Failed to open output file.", out_dir);
     }
@@ -154,10 +157,10 @@ void inv_cipher_file(unsigned Nk, const char *key, const char *in_dir, const cha
     word **key_processed = process_key(Nb, Nr, key, Nk);
 
     FILE *in_file, *out_file;
-    if (fopen_s(&in_file, in_dir, "rb")) {
+    if (!(in_file = fopen(in_dir, "rb"))) {
         error(": Failed to open input file.", in_dir);
     }
-    if (fopen_s(&out_file, out_dir, "wb")) {
+    if (!(out_file = fopen(out_dir, "wb"))) {
         fclose(in_file);
         error(": Failed to open output file.", out_dir);
     }
