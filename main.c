@@ -177,6 +177,7 @@ int main(int argc, const char **argv) {
             break;
         }
     }
+
     free(key_processed);
     return 0;
 }
