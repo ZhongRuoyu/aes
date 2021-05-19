@@ -6,8 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "io.h"
 #include "aes.h"
+#include "io.h"
 #include "key.h"
 #include "strings.h"
 
@@ -123,7 +123,8 @@ static word *hex_string_to_key(unsigned Nk, const char *str) {
     word *key = (word *)malloc(Nk * sizeof(word *));
     for (unsigned i = 0; i < Nk; ++i) {
         char buffer[9];
-        strncpy_s(buffer, 9, str + i * 8, 8);
+        strncpy(buffer, str + i * 8, 8);
+        buffer[8] = '\0';
         key[i] = strtoul(buffer, NULL, 16);
     }
     return key;
@@ -134,7 +135,8 @@ static byte *hex_string_to_block(const char *str) {
     for (unsigned j = 0; j < 4; ++j) {
         for (unsigned i = 0; i < 4; ++i) {
             char buffer[3];
-            strncpy_s(buffer, 3, str + j * 8 + i * 2, 2);
+            strncpy(buffer, str + j * 8 + i * 2, 2);
+            buffer[2] = '\0';
             block[i * 4 + j] = strtoul(buffer, NULL, 16);
         }
     }
@@ -145,7 +147,8 @@ static byte **hex_string_to_blocks(char *str, unsigned block_count) {
     byte **blocks = (byte **)malloc(block_count * sizeof(byte *));
     for (unsigned curr_block = 0; curr_block < block_count; ++curr_block) {
         char buffer[33];
-        strncpy_s(buffer, 33, str + curr_block * 32, 32);
+        strncpy(buffer, str + curr_block * 32, 32);
+        buffer[32] = '\0';
         blocks[curr_block] = hex_string_to_block(buffer);
     }
     return blocks;
@@ -156,7 +159,7 @@ static char *block_to_string(unsigned Nb, byte block[]) {
     for (unsigned j = 0; j < Nb; ++j) {
         for (unsigned i = 0; i < 4; ++i) {
             char buffer[3];
-            sprintf_s(buffer, 3, "%2x", block[i * Nb + j]);
+            snprintf(buffer, 3, "%2x", block[i * Nb + j]);
             if (isspace(buffer[0])) buffer[0] = '0';
             string_copy(str + j * 8 + i * 2, buffer, 2);
         }
