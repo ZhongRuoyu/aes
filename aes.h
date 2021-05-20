@@ -30,8 +30,8 @@ char *block_to_string(unsigned Nb, byte block[]);
 
 /* cipher.c begin */
 
-byte *Cipher(unsigned Nb, unsigned Nr, const byte in[], word **w);
-byte *InvCipher(unsigned Nb, unsigned Nr, const byte in[], word **w);
+byte *Cipher(unsigned Nb, unsigned Nr, const byte in[], byte **w);
+byte *InvCipher(unsigned Nb, unsigned Nr, const byte in[], byte **w);
 
 /* end cipher.c */
 
@@ -63,7 +63,7 @@ char *process_hex_string(const char *str);
 /* key.c begin */
 
 word *KeyExpansion(unsigned Nb, unsigned Nr, const word key[], unsigned Nk);
-word **wrap_key(unsigned Nb, unsigned Nr, const word w[], unsigned Nk);
+byte **wrap_key(unsigned Nb, unsigned Nr, const word w[], unsigned Nk);
 
 /* end key.c */
 

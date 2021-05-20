@@ -13,10 +13,10 @@
 static inline unsigned get_Nb();
 static inline unsigned get_Nr(unsigned Nk);
 
-static char *cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, word **key, byte **in, unsigned block_count);
-static char *inv_cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, word **key, byte **in, unsigned block_count);
+static char *cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, byte **key, byte **in, unsigned block_count);
+static char *inv_cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, byte **key, byte **in, unsigned block_count);
 
-static word **process_key(unsigned Nb, unsigned Nr, const char *key, unsigned Nk);
+static byte **process_key(unsigned Nb, unsigned Nr, const char *key, unsigned Nk);
 
 // ISO/IEC 9797-1, padding method 2
 static char *string_bit_padding(char *str);
@@ -29,7 +29,7 @@ static byte **hex_string_to_blocks(char *str, unsigned block_count);
 
 char *cipher_hex(unsigned Nk, const char *key, const char *in) {
     unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
-    word **key_processed = process_key(Nb, Nr, key, Nk);
+    byte **key_processed = process_key(Nb, Nr, key, Nk);
 
     char *in_processed = process_hex_string(in);
     if (strlen(in_processed) != 32) {
@@ -53,7 +53,7 @@ char *cipher_hex(unsigned Nk, const char *key, const char *in) {
 
 char *inv_cipher_hex(unsigned Nk, const char *key, const char *in) {
     unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
-    word **key_processed = process_key(Nb, Nr, key, Nk);
+    byte **key_processed = process_key(Nb, Nr, key, Nk);
 
     char *in_processed = process_hex_string(in);
     if (strlen(in_processed) != 32) {
@@ -77,7 +77,7 @@ char *inv_cipher_hex(unsigned Nk, const char *key, const char *in) {
 
 char *cipher_hex_multiblock(unsigned Nk, const char *key, const char *in) {
     unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
-    word **key_processed = process_key(Nb, Nr, key, Nk);
+    byte **key_processed = process_key(Nb, Nr, key, Nk);
 
     char *in_processed = process_hex_string(in);
     char *in_padded = string_bit_padding(in_processed);  // in_processed is reallocated
@@ -97,7 +97,7 @@ char *cipher_hex_multiblock(unsigned Nk, const char *key, const char *in) {
 
 char *inv_cipher_hex_multiblock(unsigned Nk, const char *key, const char *in) {
     unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
-    word **key_processed = process_key(Nb, Nr, key, Nk);
+    byte **key_processed = process_key(Nb, Nr, key, Nk);
 
     char *in_processed = process_hex_string(in);
     const unsigned n = strlen(in_processed);
@@ -128,7 +128,7 @@ char *inv_cipher_hex_multiblock(unsigned Nk, const char *key, const char *in) {
 
 void cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *out_dir) {
     unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
-    word **key_processed = process_key(Nb, Nr, key, Nk);
+    byte **key_processed = process_key(Nb, Nr, key, Nk);
 
     FILE *in_file, *out_file;
     if (!(in_file = fopen(in_dir, "rb"))) {
@@ -172,7 +172,7 @@ void cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *o
 
 void inv_cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *out_dir) {
     unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
-    word **key_processed = process_key(Nb, Nr, key, Nk);
+    byte **key_processed = process_key(Nb, Nr, key, Nk);
 
     FILE *in_file, *out_file;
     if (!(in_file = fopen(in_dir, "rb"))) {
@@ -262,7 +262,7 @@ static inline unsigned get_Nr(unsigned Nk) {
     return 0;
 }
 
-static char *cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, word **key, byte **in, unsigned block_count) {
+static char *cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, byte **key, byte **in, unsigned block_count) {
     char *out = (char *)malloc((block_count * 32 + 1) * sizeof(char));
     for (unsigned i = 0; i < block_count; ++i) {
         byte *out_bytes = Cipher(Nb, Nr, in[i], key);
@@ -275,7 +275,7 @@ static char *cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, word **
     return out;
 }
 
-static char *inv_cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, word **key, byte **in, unsigned block_count) {
+static char *inv_cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, byte **key, byte **in, unsigned block_count) {
     char *out = (char *)malloc((block_count * 32 + 1) * sizeof(char));
     for (unsigned i = 0; i < block_count; ++i) {
         byte *out_bytes = InvCipher(Nb, Nr, in[i], key);
@@ -288,11 +288,11 @@ static char *inv_cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, wor
     return out;
 }
 
-static word **process_key(unsigned Nb, unsigned Nr, const char *key, unsigned Nk) {
+static byte **process_key(unsigned Nb, unsigned Nr, const char *key, unsigned Nk) {
     word *key_words = hex_string_to_key(Nk, key);
     word *key_expanded = KeyExpansion(Nb, Nr, key_words, Nk);
     free(key_words);
-    word **key_processed = wrap_key(Nb, Nr, key_expanded, Nk);
+    byte **key_processed = wrap_key(Nb, Nr, key_expanded, Nk);
     free(key_expanded);
     return key_processed;
 }

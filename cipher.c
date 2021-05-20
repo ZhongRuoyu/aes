@@ -5,8 +5,8 @@
 #include "aes.h"
 #include "io.h"
 
-static byte *verbose_Cipher(unsigned Nb, unsigned Nr, const byte in[], word **w);
-static byte *verbose_InvCipher(unsigned Nb, unsigned Nr, const byte in[], word **w);
+static byte *verbose_Cipher(unsigned Nb, unsigned Nr, const byte in[], byte **w);
+static byte *verbose_InvCipher(unsigned Nb, unsigned Nr, const byte in[], byte **w);
 
 static inline byte multiply(byte a, byte b);
 
@@ -16,9 +16,9 @@ static void ShiftRows(unsigned Nb, byte state[]);
 static void InvShiftRows(unsigned Nb, byte state[]);
 static void MixColumns(unsigned Nb, byte state[]);
 static void InvMixColumns(unsigned Nb, byte state[]);
-static void AddRoundKey(unsigned Nb, byte state[], const word w[]);
+static inline void AddRoundKey(unsigned Nb, byte state[], const byte w[]);
 
-byte *Cipher(unsigned Nb, unsigned Nr, const byte in[], word **w) {
+byte *Cipher(unsigned Nb, unsigned Nr, const byte in[], byte **w) {
     if (verbose) return verbose_Cipher(Nb, Nr, in, w);
 
     byte *state = (byte *)malloc(4 * Nb * sizeof(byte));
@@ -40,9 +40,8 @@ byte *Cipher(unsigned Nb, unsigned Nr, const byte in[], word **w) {
     return state;
 }
 
-static byte *verbose_Cipher(unsigned Nb, unsigned Nr, const byte in[], word **w) {
+static byte *verbose_Cipher(unsigned Nb, unsigned Nr, const byte in[], byte **w) {
     printf("CIPHER (ENCRYPT):\n");
-    byte *k_sch;
 
     byte *state = (byte *)malloc(4 * Nb * sizeof(byte));
     memcpy(state, in, 4 * Nb * sizeof(byte));
@@ -53,9 +52,7 @@ static byte *verbose_Cipher(unsigned Nb, unsigned Nr, const byte in[], word **w)
     AddRoundKey(Nb, state, w[0]);
 
     printf("round[%2d].k_sch    ", 0);
-    k_sch = to_bytes_array(Nb, w[0]);
-    print_block(Nb, k_sch);
-    free(k_sch);
+    print_block(Nb, w[0]);
 
     for (unsigned round = 1; round < Nr; ++round) {
         printf("round[%2d].start    ", round);
@@ -79,9 +76,7 @@ static byte *verbose_Cipher(unsigned Nb, unsigned Nr, const byte in[], word **w)
         AddRoundKey(Nb, state, w[round]);
 
         printf("round[%2d].k_sch    ", round);
-        k_sch = to_bytes_array(Nb, w[round]);
-        print_block(Nb, k_sch);
-        free(k_sch);
+        print_block(Nb, w[round]);
     }
 
     printf("round[%2d].start    ", Nr);
@@ -100,9 +95,7 @@ static byte *verbose_Cipher(unsigned Nb, unsigned Nr, const byte in[], word **w)
     AddRoundKey(Nb, state, w[Nr]);
 
     printf("round[%2d].k_sch    ", Nr);
-    k_sch = to_bytes_array(Nb, w[Nr]);
-    print_block(Nb, k_sch);
-    free(k_sch);
+    print_block(Nb, w[Nr]);
 
     printf("round[%2d].output   ", Nr);
     print_block(Nb, state);
@@ -111,7 +104,7 @@ static byte *verbose_Cipher(unsigned Nb, unsigned Nr, const byte in[], word **w)
     return state;
 }
 
-byte *InvCipher(unsigned Nb, unsigned Nr, const byte in[], word **w) {
+byte *InvCipher(unsigned Nb, unsigned Nr, const byte in[], byte **w) {
     if (verbose) return verbose_InvCipher(Nb, Nr, in, w);
 
     byte *state = (byte *)malloc(4 * Nb * sizeof(byte));
@@ -133,9 +126,8 @@ byte *InvCipher(unsigned Nb, unsigned Nr, const byte in[], word **w) {
     return state;
 }
 
-static byte *verbose_InvCipher(unsigned Nb, unsigned Nr, const byte in[], word **w) {
+static byte *verbose_InvCipher(unsigned Nb, unsigned Nr, const byte in[], byte **w) {
     printf("INVERSE CIPHER (DECRYPT):\n");
-    byte *ik_sch;
 
     byte *state = (byte *)malloc(4 * Nb * sizeof(byte));
     memcpy(state, in, 4 * Nb * sizeof(byte));
@@ -146,9 +138,7 @@ static byte *verbose_InvCipher(unsigned Nb, unsigned Nr, const byte in[], word *
     AddRoundKey(Nb, state, w[Nr]);
 
     printf("round[%2d].ik_sch   ", 0);
-    ik_sch = to_bytes_array(Nb, w[Nr]);
-    print_block(Nb, ik_sch);
-    free(ik_sch);
+    print_block(Nb, w[Nr]);
 
     for (unsigned round = Nr - 1; round > 0; --round) {
         printf("round[%2d].istart   ", Nr - round);
@@ -167,9 +157,7 @@ static byte *verbose_InvCipher(unsigned Nb, unsigned Nr, const byte in[], word *
         AddRoundKey(Nb, state, w[round]);
 
         printf("round[%2d].ik_sch   ", Nr - round);
-        ik_sch = to_bytes_array(Nb, w[round]);
-        print_block(Nb, ik_sch);
-        free(ik_sch);
+        print_block(Nb, w[round]);
 
         printf("round[%2d].ik_add   ", Nr - round);
         print_block(Nb, state);
@@ -193,9 +181,7 @@ static byte *verbose_InvCipher(unsigned Nb, unsigned Nr, const byte in[], word *
     AddRoundKey(Nb, state, w[0]);
 
     printf("round[%2d].ik_sch   ", Nr);
-    ik_sch = to_bytes_array(Nb, w[0]);
-    print_block(Nb, ik_sch);
-    free(ik_sch);
+    print_block(Nb, w[0]);
 
     printf("round[%2d].output   ", Nr);
     print_block(Nb, state);
@@ -277,10 +263,8 @@ static void InvMixColumns(unsigned Nb, byte state[]) {
     free(new_state);
 }
 
-static void AddRoundKey(unsigned Nb, byte state[], const word w[]) {
-    byte *bytes = to_bytes_array(Nb, w);
+static inline void AddRoundKey(unsigned Nb, byte state[], const byte w[]) {
     for (unsigned pos = 0; pos < 4 * Nb; ++pos) {
-        state[pos] ^= bytes[pos];
+        state[pos] ^= w[pos];
     }
-    free(bytes);
 }
