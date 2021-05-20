@@ -289,13 +289,7 @@ static char *inv_cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, wor
 }
 
 static word **process_key(unsigned Nb, unsigned Nr, const char *key, unsigned Nk) {
-    char *key_hex = process_hex_string(key);
-    if (strlen(key_hex) != Nk * 8) {
-        free(key_hex);
-        error("Incorrect key length.", NULL);
-    }
-    word *key_words = hex_string_to_key(Nk, key_hex);
-    free(key_hex);
+    word *key_words = hex_string_to_key(Nk, key);
     word *key_expanded = KeyExpansion(Nb, Nr, key_words, Nk);
     free(key_words);
     word **key_processed = wrap_key(Nb, Nr, key_expanded, Nk);
