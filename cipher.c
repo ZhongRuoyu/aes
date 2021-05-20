@@ -8,7 +8,7 @@
 static byte *verbose_Cipher(unsigned Nb, unsigned Nr, const byte in[], word **w);
 static byte *verbose_InvCipher(unsigned Nb, unsigned Nr, const byte in[], word **w);
 
-static byte multiply(byte a, byte b);
+static inline byte multiply(byte a, byte b);
 
 static void SubBytes(unsigned Nb, byte state[]);
 static void InvSubBytes(unsigned Nb, byte state[]);
@@ -204,7 +204,7 @@ static byte *verbose_InvCipher(unsigned Nb, unsigned Nr, const byte in[], word *
     return state;
 }
 
-static byte multiply(byte a, byte b) {
+static inline byte multiply(byte a, byte b) {
     byte res = 0;
     for (; b; b >>= 1) {
         if (b & 1) res ^= a;
