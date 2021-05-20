@@ -42,7 +42,7 @@ static word RotWord(word w) {
 }
 
 byte **wrap_key(unsigned Nb, unsigned Nr, const word w[], unsigned Nk) {
-    byte **out = (byte **)malloc((Nr + 1) * sizeof(const byte *));
+    byte **out = (byte **)malloc((Nr + 1) * sizeof(byte *));
     for (unsigned i = 0; i <= Nr; ++i) {
         word *temp = (word *)malloc(Nb * sizeof(word));
         for (unsigned j = 0; j < Nb; ++j) {
