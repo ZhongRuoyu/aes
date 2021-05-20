@@ -239,7 +239,7 @@ static void MixColumns(unsigned Nb, byte state[]) {
         for (unsigned i = 0; i < 4; ++i) {
             byte product = 0;
             for (unsigned k = 0; k < 4; ++k) {
-                product ^= multiply(state[k * Nb + j], MixColumns_multiplier[(4 - i + k) % 4]);
+                product ^= MixColumns_table[(4 - i + k) % 4][state[k * Nb + j]];
             }
             new_state[i * Nb + j] = product;
         }
@@ -254,7 +254,7 @@ static void InvMixColumns(unsigned Nb, byte state[]) {
         for (unsigned i = 0; i < 4; ++i) {
             byte product = 0;
             for (unsigned k = 0; k < 4; ++k) {
-                product ^= multiply(state[k * Nb + j], InvMixColumns_multiplier[(4 - i + k) % 4]);
+                product ^= InvMixColumns_table[(4 - i + k) % 4][state[k * Nb + j]];
             }
             new_state[i * Nb + j] = product;
         }
