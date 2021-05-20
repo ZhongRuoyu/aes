@@ -48,7 +48,7 @@ void usage(const char *basename) {
             "                  the AES algorithm.\n"
             "          -v    Verbose output: enables display of cipher procedure. Warning: \n"
             "                  this produces excessive output when processing large files.\n"
-            "          -t    Time display: enables display of time elapsed when finished.\n"
+            "          -t    Time display: displays time elapsed when finished.\n"
             "          -s    Single-block mode: encrypts the single-block hexadecimal \n"
             "                  string. <hex-string> must be a valid 128-bit hexadecimal \n"
             "                  string.\n"
