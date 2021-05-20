@@ -34,7 +34,7 @@ char *cipher_hex(unsigned Nk, const char *key, const char *in) {
     char *in_processed = process_hex_string(in);
     if (strlen(in_processed) != 32) {
         free(in_processed);
-        for (unsigned i = 0; i < Nr + 1; ++i) free(key_processed[i]);
+        for (unsigned i = 0; i <= Nr; ++i) free(key_processed[i]);
         free(key_processed);
         error("Incorrect input length.", NULL);
     }
@@ -43,7 +43,7 @@ char *cipher_hex(unsigned Nk, const char *key, const char *in) {
 
     char *out = cipher_hex_interface(Nb, Nk, Nr, key_processed, in_blocks, 1);
 
-    for (unsigned i = 0; i < Nr + 1; ++i) free(key_processed[i]);
+    for (unsigned i = 0; i <= Nr; ++i) free(key_processed[i]);
     free(key_processed);
     free(in_blocks[0]);
     free(in_blocks);
@@ -58,7 +58,7 @@ char *inv_cipher_hex(unsigned Nk, const char *key, const char *in) {
     char *in_processed = process_hex_string(in);
     if (strlen(in_processed) != 32) {
         free(in_processed);
-        for (unsigned i = 0; i < Nr + 1; ++i) free(key_processed[i]);
+        for (unsigned i = 0; i <= Nr; ++i) free(key_processed[i]);
         free(key_processed);
         error("Incorrect input length.", NULL);
     }
@@ -67,7 +67,7 @@ char *inv_cipher_hex(unsigned Nk, const char *key, const char *in) {
 
     char *out = inv_cipher_hex_interface(Nb, Nk, Nr, key_processed, in_blocks, 1);
 
-    for (unsigned i = 0; i < Nr + 1; ++i) free(key_processed[i]);
+    for (unsigned i = 0; i <= Nr; ++i) free(key_processed[i]);
     free(key_processed);
     free(in_blocks[0]);
     free(in_blocks);
@@ -87,7 +87,7 @@ char *cipher_hex_multiblock(unsigned Nk, const char *key, const char *in) {
 
     char *out = cipher_hex_interface(Nb, Nk, Nr, key_processed, in_blocks, block_count);
 
-    for (unsigned i = 0; i < Nr + 1; ++i) free(key_processed[i]);
+    for (unsigned i = 0; i <= Nr; ++i) free(key_processed[i]);
     free(key_processed);
     for (unsigned i = 0; i < block_count; ++i) free(in_blocks[i]);
     free(in_blocks);
@@ -103,7 +103,7 @@ char *inv_cipher_hex_multiblock(unsigned Nk, const char *key, const char *in) {
     const unsigned n = strlen(in_processed);
     if (n % 32) {
         free(in_processed);
-        for (unsigned i = 0; i < Nr + 1; ++i) free(key_processed[i]);
+        for (unsigned i = 0; i <= Nr; ++i) free(key_processed[i]);
         free(key_processed);
         error("Incorrect input length.", NULL);
     }
@@ -113,7 +113,7 @@ char *inv_cipher_hex_multiblock(unsigned Nk, const char *key, const char *in) {
 
     char *out = inv_cipher_hex_interface(Nb, Nk, Nr, key_processed, in_blocks, block_count);
 
-    for (unsigned i = 0; i < Nr + 1; ++i) free(key_processed[i]);
+    for (unsigned i = 0; i <= Nr; ++i) free(key_processed[i]);
     free(key_processed);
     for (unsigned i = 0; i < block_count; ++i) free(in_blocks[i]);
     free(in_blocks);
@@ -163,7 +163,7 @@ void cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *o
     free(out_buffer);
 
     free(buffer);
-    for (unsigned i = 0; i < Nr + 1; ++i) free(key_processed[i]);
+    for (unsigned i = 0; i <= Nr; ++i) free(key_processed[i]);
     free(key_processed);
 
     fclose(in_file);
@@ -188,7 +188,7 @@ void inv_cipher_file(unsigned Nk, const char *key, const char *in_dir, const cha
     rewind(in_file);
 
     if (file_size == 0 || file_size % (4 * Nb)) {
-        for (unsigned i = 0; i < Nr + 1; ++i) free(key_processed[i]);
+        for (unsigned i = 0; i <= Nr; ++i) free(key_processed[i]);
         free(key_processed);
         fclose(in_file);
         fclose(out_file);
@@ -212,7 +212,7 @@ void inv_cipher_file(unsigned Nk, const char *key, const char *in_dir, const cha
     if (pos < 0) {
         free(buffer);
         free(out_buffer);
-        for (unsigned i = 0; i < Nr + 1; ++i) free(key_processed[i]);
+        for (unsigned i = 0; i <= Nr; ++i) free(key_processed[i]);
         free(key_processed);
         fclose(in_file);
         fclose(out_file);
@@ -223,7 +223,7 @@ void inv_cipher_file(unsigned Nk, const char *key, const char *in_dir, const cha
     free(out_buffer);
 
     free(buffer);
-    for (unsigned i = 0; i < Nr + 1; ++i) free(key_processed[i]);
+    for (unsigned i = 0; i <= Nr; ++i) free(key_processed[i]);
     free(key_processed);
 
     fclose(in_file);

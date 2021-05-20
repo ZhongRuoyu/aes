@@ -43,7 +43,7 @@ static word RotWord(word w) {
 
 word **wrap_key(unsigned Nb, unsigned Nr, const word w[], unsigned Nk) {
     word **out = (word **)malloc((Nr + 1) * sizeof(const word *));
-    for (unsigned i = 0; i < Nr + 1; ++i) {
+    for (unsigned i = 0; i <= Nr; ++i) {
         out[i] = (word *)malloc(Nb * sizeof(word));
         for (unsigned j = 0; j < Nb; ++j) {
             out[i][j] = w[i * Nb + j];
