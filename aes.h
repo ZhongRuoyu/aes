@@ -38,10 +38,8 @@ byte *InvCipher(unsigned Nb, unsigned Nr, const byte in[], byte **w);
 /* data.c begin */
 
 extern const word Rcon[];
-extern const byte MixColumns_multiplier[];
-extern const byte InvMixColumns_multiplier[];
-extern const byte s_box[];
-extern const byte inverse_s_box[];
+extern const byte s_box[256];
+extern const byte inverse_s_box[256];
 extern const byte MixColumns_table[4][256];
 extern const byte InvMixColumns_table[4][256];
 
