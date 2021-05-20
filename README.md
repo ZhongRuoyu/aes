@@ -36,6 +36,8 @@ To build `AES`, include all the source files in the root directory. For instance
 clang *.c -o aes
 ``` 
 
+Compiler optimisation can be turned on to enable better performance.
+
 ## Licence
 
 Copyright (c) 2021 Zhong Ruoyu.
