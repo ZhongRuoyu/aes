@@ -43,8 +43,7 @@ char *block_to_string(unsigned Nb, byte block[]) {
     for (unsigned j = 0; j < Nb; ++j) {
         for (unsigned i = 0; i < 4; ++i) {
             char buffer[3];
-            snprintf(buffer, 3, "%2x", block[i * Nb + j]);
-            if (isspace(buffer[0])) buffer[0] = '0';
+            snprintf(buffer, 3, "%02x", block[i * Nb + j]);
             memcpy(str + j * 8 + i * 2, buffer, 2 * sizeof(char));
         }
     }

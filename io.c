@@ -25,10 +25,7 @@ void print_multiline(char *str, char delimiter) {
 void print_block(unsigned Nb, const byte block[]) {
     for (unsigned j = 0; j < Nb; ++j) {
         for (unsigned i = 0; i < 4; ++i) {
-            char buffer[3];
-            snprintf(buffer, 3, "%2x", block[i * 4 + j]);
-            if (isspace(buffer[0])) buffer[0] = '0';
-            printf("%2s", buffer);
+            printf("%02x", block[i * 4 + j]);
         }
     }
     printf("\n");
