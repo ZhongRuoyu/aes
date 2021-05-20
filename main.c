@@ -132,7 +132,7 @@ int main(int argc, const char **argv) {
 
     if (mode == UNDEFINED) error("The cipher mode is not specified.", NULL);
     if (input_mode == INPUT_UNDEFINED) error("The input mode is not specified.", NULL);
-    if (key_mode == UNDEFINED) error("The key mode is not specified.", NULL);
+    if (key_mode == KEY_UNDEFINED) error("The key mode is not specified.", NULL);
 
     if (key_mode == KEY_FILE) {
         key = read_from_key_file(key_dir);
