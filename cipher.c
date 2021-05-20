@@ -8,8 +8,6 @@
 static byte *verbose_Cipher(unsigned Nb, unsigned Nr, const byte in[], byte **w);
 static byte *verbose_InvCipher(unsigned Nb, unsigned Nr, const byte in[], byte **w);
 
-static inline byte multiply(byte a, byte b);
-
 static void SubBytes(unsigned Nb, byte state[]);
 static void InvSubBytes(unsigned Nb, byte state[]);
 static void ShiftRows(unsigned Nb, byte state[]);
@@ -188,15 +186,6 @@ static byte *verbose_InvCipher(unsigned Nb, unsigned Nr, const byte in[], byte *
     printf("\n");
 
     return state;
-}
-
-static inline byte multiply(byte a, byte b) {
-    byte res = 0;
-    for (; b; b >>= 1) {
-        if (b & 1) res ^= a;
-        a = a << 1 ^ (a & 0x80 ? 0x1b : 0);
-    }
-    return res;
 }
 
 static void SubBytes(unsigned Nb, byte state[]) {
