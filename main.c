@@ -4,11 +4,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "aes.h"
 #include "io.h"
 
 int verbose = 0;
+int time_display = 0;
 
 typedef enum InputMode {
     INPUT_UNDEFINED,
@@ -36,7 +38,7 @@ static const char *read_from_key_file(const char *filename);
 void usage(const char *basename) {
     fprintf(stderr,
             "Usage:\n"
-            "    %s {-e|-d} [-v] { (-s|-m) <hex-string> | -f <in> <out> } { -k <key> | -kfile <file> }\n"
+            "    %s {-e|-d} [-v] [-t] { (-s|-m) <hex-string> | -f <in> <out> } { -k <key> | -kfile <file> }\n"
             "    %s {-h|--help}\n"
             "\n"
             "Options:\n"
@@ -46,6 +48,7 @@ void usage(const char *basename) {
             "                  the AES algorithm.\n"
             "          -v    Verbose output: enables display of cipher procedure. Warning: \n"
             "                  this produces excessive output when processing large files.\n"
+            "          -t    Time display: enables display of time elapsed when finished.\n"
             "          -s    Single-block mode: encrypts the single-block hexadecimal \n"
             "                  string. <hex-string> must be a valid 128-bit hexadecimal \n"
             "                  string.\n"
@@ -71,6 +74,8 @@ void usage(const char *basename) {
 }
 
 int main(int argc, const char **argv) {
+    clock_t begin = clock();
+
     const char *basename = get_basename(argv[0]);
 
     if (argc == 1) usage(basename);
@@ -94,6 +99,9 @@ int main(int argc, const char **argv) {
         } else if (strcmp(argv[i], "-v") == 0) {
             if (verbose != 0) error("-v can only be specified once.", NULL);
             verbose = 1;
+        } else if (strcmp(argv[i], "-t") == 0) {
+            if (time_display != 0) error("-t can only be specified once.", NULL);
+            time_display = 1;
         } else if (strcmp(argv[i], "-s") == 0) {
             if (input_mode != INPUT_UNDEFINED) error("Only one input mode can be specified.", NULL);
             input_mode = SINGLE_BLOCK_INPUT;
@@ -183,6 +191,11 @@ int main(int argc, const char **argv) {
     }
 
     free(key_processed);
+
+    clock_t end = clock();
+    if (time_display) {
+        printf("Time elapsed: %.3fs.\n", (double)(end - begin) / CLOCKS_PER_SEC);
+    }
 
     return 0;
 }
