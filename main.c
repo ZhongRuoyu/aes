@@ -194,7 +194,7 @@ int main(int argc, const char **argv) {
 
     clock_t end = clock();
     if (time_display) {
-        printf("Time elapsed: %.3fs.\n", (double)(end - begin) / CLOCKS_PER_SEC);
+        printf("Time elapsed: %.3fs.\n\n", (double)(end - begin) / CLOCKS_PER_SEC);
     }
 
     return 0;
