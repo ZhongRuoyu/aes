@@ -42,11 +42,9 @@ char *block_to_string(unsigned Nb, byte block[]) {
     char *str = (char *)malloc((8 * Nb + 1) * sizeof(char));
     for (unsigned j = 0; j < Nb; ++j) {
         for (unsigned i = 0; i < 4; ++i) {
-            char buffer[3];
-            snprintf(buffer, 3, "%02x", block[i * Nb + j]);
-            memcpy(str + j * 8 + i * 2, buffer, 2 * sizeof(char));
+            snprintf(str + j * 8 + i * 2, 3, "%02x", block[i * Nb + j]);
         }
     }
-    str[8 * Nb] = '\0';
+    // the terminating null character is handled by the last snprintf() call
     return str;
 }
