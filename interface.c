@@ -8,7 +8,6 @@
 
 #include "aes.h"
 #include "io.h"
-#include "strings.h"
 
 static inline unsigned get_Nb();
 static inline unsigned get_Nr(unsigned Nk);
@@ -275,7 +274,7 @@ static char *cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, byte **
         byte *out_bytes = Cipher(Nb, Nr, in[i], key);
         char *out_str = block_to_string(Nb, out_bytes);
         free(out_bytes);
-        string_copy(out + i * 32, out_str, 32);
+        memcpy(out + i * 32, out_str, 32 * sizeof(char));
         free(out_str);
     }
     out[block_count * 32] = '\0';
@@ -288,7 +287,7 @@ static char *inv_cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, byt
         byte *out_bytes = InvCipher(Nb, Nr, in[i], key);
         char *out_str = block_to_string(Nb, out_bytes);
         free(out_bytes);
-        string_copy(out + i * 32, out_str, 32);
+        memcpy(out + i * 32, out_str, 32 * sizeof(char));
         free(out_str);
     }
     out[block_count * 32] = '\0';

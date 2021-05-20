@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include "aes.h"
-#include "strings.h"
 
 byte *to_bytes(word w) {
     byte *bytes = (byte *)malloc(4 * sizeof(byte));
@@ -46,7 +45,7 @@ char *block_to_string(unsigned Nb, byte block[]) {
             char buffer[3];
             snprintf(buffer, 3, "%2x", block[i * Nb + j]);
             if (isspace(buffer[0])) buffer[0] = '0';
-            string_copy(str + j * 8 + i * 2, buffer, 2);
+            memcpy(str + j * 8 + i * 2, buffer, 2 * sizeof(char));
         }
     }
     str[8 * Nb] = '\0';
