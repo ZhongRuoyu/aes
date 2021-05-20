@@ -139,30 +139,31 @@ void cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *o
         error(": Failed to open output file.", out_dir);
     }
 
-    byte *buffer = (byte *)malloc(4 * Nb * sizeof(byte));
-    unsigned bytes_read;
-    while ((bytes_read = fread(buffer, sizeof(byte), 4 * Nb, in_file)) == 4 * Nb) {
-        transpose_block(Nb, buffer);
-        byte *out_buffer = Cipher(Nb, Nr, buffer, key_processed);
-        fwrite(out_buffer, sizeof(byte), 4 * Nb, out_file);
-        free(out_buffer);
-    }
+    {
+        byte *buffer = (byte *)malloc(4 * Nb * sizeof(byte));
+        unsigned bytes_read;
 
-    if (bytes_read == 4 * Nb) {
-        memset(buffer, 0x00, 4 * Nb * sizeof(byte));
-        buffer[0] = 0x80;
-    } else {
-        buffer[bytes_read] = 0x80;
-        for (unsigned i = bytes_read + 1; i < 4 * Nb; ++i) {
-            buffer[i] = 0x00;
+        while ((bytes_read = fread(buffer, sizeof(byte), 4 * Nb, in_file)) == 4 * Nb) {
+            transpose_block(Nb, buffer);
+            byte *out_buffer = Cipher(Nb, Nr, buffer, key_processed);
+            fwrite(out_buffer, sizeof(byte), 4 * Nb, out_file);
+            free(out_buffer);
         }
-    }
-    transpose_block(Nb, buffer);
-    byte *out_buffer = Cipher(Nb, Nr, buffer, key_processed);
-    fwrite(out_buffer, sizeof(byte), 4 * Nb, out_file);
-    free(out_buffer);
 
-    free(buffer);
+        {
+            buffer[bytes_read] = 0x80;
+            for (unsigned i = bytes_read + 1; i < 4 * Nb; ++i) {
+                buffer[i] = 0x00;
+            }
+            transpose_block(Nb, buffer);
+            byte *out_buffer = Cipher(Nb, Nr, buffer, key_processed);
+            fwrite(out_buffer, sizeof(byte), 4 * Nb, out_file);
+            free(out_buffer);
+        }
+
+        free(buffer);
+    }
+
     for (unsigned i = 0; i <= Nr; ++i) free(key_processed[i]);
     free(key_processed);
 
@@ -196,33 +197,39 @@ void inv_cipher_file(unsigned Nk, const char *key, const char *in_dir, const cha
         error(": Incorrect input file. Is it empty or modified?", in_dir);
     }
 
-    byte *buffer = (byte *)malloc(4 * Nb * sizeof(byte));
-    for (unsigned bytes_read = 0; (bytes_read + 4 * Nb) < file_size;) {
-        bytes_read += fread(buffer, sizeof(byte), 4 * Nb, in_file);
-        transpose_block(Nb, buffer);
-        byte *out_buffer = InvCipher(Nb, Nr, buffer, key_processed);
-        fwrite(out_buffer, sizeof(byte), 4 * Nb, out_file);
-        free(out_buffer);
-    }
-    fread(buffer, sizeof(byte), 4 * Nb, in_file);
-    transpose_block(Nb, buffer);
-    byte *out_buffer = InvCipher(Nb, Nr, buffer, key_processed);
+    {
+        byte *buffer = (byte *)malloc(4 * Nb * sizeof(byte));
 
-    int pos = get_block_bit_padding_position(Nb, out_buffer);
-    if (pos < 0) {
+        for (unsigned bytes_read = 0; (bytes_read + 4 * Nb) < file_size;) {
+            bytes_read += fread(buffer, sizeof(byte), 4 * Nb, in_file);
+            transpose_block(Nb, buffer);
+            byte *out_buffer = InvCipher(Nb, Nr, buffer, key_processed);
+            fwrite(out_buffer, sizeof(byte), 4 * Nb, out_file);
+            free(out_buffer);
+        }
+
+        {
+            fread(buffer, sizeof(byte), 4 * Nb, in_file);
+            transpose_block(Nb, buffer);
+            byte *out_buffer = InvCipher(Nb, Nr, buffer, key_processed);
+            int pos = get_block_bit_padding_position(Nb, out_buffer);
+            if (pos < 0) {
+                free(buffer);
+                free(out_buffer);
+                for (unsigned i = 0; i <= Nr; ++i) free(key_processed[i]);
+                free(key_processed);
+                fclose(in_file);
+                fclose(out_file);
+                remove(out_dir);
+                error(": Could not correctly interpret input.", in_dir);
+            }
+            fwrite(out_buffer, sizeof(byte), pos, out_file);
+            free(out_buffer);
+        }
+
         free(buffer);
-        free(out_buffer);
-        for (unsigned i = 0; i <= Nr; ++i) free(key_processed[i]);
-        free(key_processed);
-        fclose(in_file);
-        fclose(out_file);
-        remove(out_dir);
-        error(": Could not correctly interpret input.", in_dir);
     }
-    fwrite(out_buffer, sizeof(byte), pos, out_file);
-    free(out_buffer);
 
-    free(buffer);
     for (unsigned i = 0; i <= Nr; ++i) free(key_processed[i]);
     free(key_processed);
 
