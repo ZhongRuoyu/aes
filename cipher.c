@@ -226,11 +226,11 @@ static void MixColumns(unsigned Nb, byte state[]) {
     byte *new_state = (byte *)malloc(4 * Nb * sizeof(byte));
     for (unsigned j = 0; j < Nb; ++j) {
         for (unsigned i = 0; i < 4; ++i) {
-            byte product = 0;
-            for (unsigned k = 0; k < 4; ++k) {
-                product ^= MixColumns_table[(4 - i + k) % 4][state[k * Nb + j]];
-            }
-            new_state[i * Nb + j] = product;
+            new_state[i * Nb + j] =
+                MixColumns_table[(4 - i + 0) % 4][state[0 * Nb + j]] ^
+                MixColumns_table[(4 - i + 1) % 4][state[1 * Nb + j]] ^
+                MixColumns_table[(4 - i + 2) % 4][state[2 * Nb + j]] ^
+                MixColumns_table[(4 - i + 3) % 4][state[3 * Nb + j]];
         }
     }
     memcpy(state, new_state, 4 * Nb * sizeof(byte));
@@ -241,11 +241,11 @@ static void InvMixColumns(unsigned Nb, byte state[]) {
     byte *new_state = (byte *)malloc(4 * Nb * sizeof(byte));
     for (unsigned j = 0; j < Nb; ++j) {
         for (unsigned i = 0; i < 4; ++i) {
-            byte product = 0;
-            for (unsigned k = 0; k < 4; ++k) {
-                product ^= InvMixColumns_table[(4 - i + k) % 4][state[k * Nb + j]];
-            }
-            new_state[i * Nb + j] = product;
+            new_state[i * Nb + j] =
+                InvMixColumns_table[(4 - i + 0) % 4][state[0 * Nb + j]] ^
+                InvMixColumns_table[(4 - i + 1) % 4][state[1 * Nb + j]] ^
+                InvMixColumns_table[(4 - i + 2) % 4][state[2 * Nb + j]] ^
+                InvMixColumns_table[(4 - i + 3) % 4][state[3 * Nb + j]];
         }
     }
     memcpy(state, new_state, 4 * Nb * sizeof(byte));
