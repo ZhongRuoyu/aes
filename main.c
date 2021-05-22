@@ -46,8 +46,9 @@ void usage(const char *basename) {
             "                  algorithm.\n"
             "          -d    Decryption (Inverse Cipher) mode: decrypts information with \n"
             "                  the AES algorithm.\n"
-            "          -v    Verbose output: enables display of cipher procedure. Warning: \n"
-            "                  this produces excessive output when processing large files.\n"
+            "          -v    Verbose output: enables display of cipher procedure. \n"
+            "                  Deprecation warning: verbose output is no longer supported.\n"
+            "                  The option -v will be removed in the next release.\n"
             "          -t    Time display: displays time elapsed when finished.\n"
             "          -s    Single-block mode: encrypts the single-block hexadecimal \n"
             "                  string. <hex-string> must be a valid 128-bit hexadecimal \n"
@@ -99,6 +100,10 @@ int main(int argc, const char **argv) {
         } else if (strcmp(argv[i], "-v") == 0) {
             if (verbose != 0) error("-v can only be specified once.", NULL);
             verbose = 1;
+            fprintf(stderr,
+                    "Deprecation warning: verbose output is no longer supported. The option -v will \n"
+                    "be removed in the next release.\n"
+                    "\n");
         } else if (strcmp(argv[i], "-t") == 0) {
             if (time_display != 0) error("-t can only be specified once.", NULL);
             time_display = 1;
