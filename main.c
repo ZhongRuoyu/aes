@@ -33,7 +33,7 @@ static const char *get_basename(const char *path) {
     return path;
 }
 
-static const char *read_from_key_file(const char *filename);
+static char *read_from_file(const char *filename);
 
 void usage(const char *basename) {
     fprintf(stderr,
@@ -150,7 +150,7 @@ int main(int argc, const char **argv) {
     if (key_mode == KEY_UNDEFINED) error("The key mode is not specified.", NULL);
 
     if (key_mode == KEY_FILE) {
-        key = read_from_key_file(key_dir);
+        key = read_from_file(key_dir);
     }
     char *key_processed = process_hex_string(key);
     if (key_mode == KEY_FILE) free((void *)key);
@@ -207,11 +207,11 @@ int main(int argc, const char **argv) {
     return 0;
 }
 
-static const char *read_from_key_file(const char *filename) {
+static char *read_from_file(const char *filename) {
     FILE *file;
 
     if (!(file = fopen(filename, "r"))) {
-        error(": Failed to open key file.", filename);
+        error(": Failed to open file.", filename);
     }
 
     fseek(file, 0, SEEK_END);
