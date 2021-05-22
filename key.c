@@ -1,55 +1,42 @@
-#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "aes.h"
-#include "io.h"
 
-static word SubWord(word w);
-static word RotWord(word w);
+static inline word SubWord(word w);
+static inline word RotWord(word w);
 
-word *KeyExpansion(unsigned Nb, unsigned Nr, const word key[], unsigned Nk) {
+word **KeyExpansion(unsigned Nb, unsigned Nr, const word key[], unsigned Nk) {
     word *w = (word *)malloc(Nb * (Nr + 1) * sizeof(word));
 
-    for (unsigned i = 0; i < Nk; ++i) {
-        w[i] = key[i];
-    }
+    memcpy(w, key, Nk * sizeof(word));
 
     for (unsigned i = Nk; i < Nb * (Nr + 1); ++i) {
-        word temp = w[i - 1];
-        if (i % Nk == 0) {
-            temp = SubWord(RotWord(temp)) ^ Rcon[i / Nk];
-        } else if (Nk > 6 && i % Nk == 4) {
-            temp = SubWord(temp);
-        }
-        w[i] = w[i - Nk] ^ temp;
+        w[i] = w[i - Nk] ^
+               ((i % Nk == 0)             ? (SubWord(RotWord(w[i - 1])) ^ Rcon[i / Nk])
+                : (Nk > 6 && i % Nk == 4) ? SubWord(w[i - 1])
+                                          : w[i - 1]);
     }
 
-    return w;
-}
-
-static word SubWord(word in) {
-    byte *bytes = to_bytes(in);
-    for (unsigned i = 0; i < 4; ++i) {
-        bytes[i] = s_box[bytes[i]];
-    }
-    word out = to_word(bytes[3], bytes[2], bytes[1], bytes[0]);
-    free(bytes);
-    return out;
-}
-
-static word RotWord(word w) {
-    return (w << 8) | (w >> 24);
-}
-
-byte **wrap_key(unsigned Nb, unsigned Nr, const word w[], unsigned Nk) {
-    byte **out = (byte **)malloc((Nr + 1) * sizeof(byte *));
+    word **out = (word **)malloc((Nr + 1) * sizeof(word *));
     for (unsigned i = 0; i <= Nr; ++i) {
-        word *temp = (word *)malloc(Nb * sizeof(word));
-        for (unsigned j = 0; j < Nb; ++j) {
-            temp[j] = w[i * Nb + j];
-        }
-        out[i] = to_bytes_array(Nb, temp);
-        free(temp);
+        out[i] = (word *)malloc(Nb * sizeof(word));
+        memcpy(out[i], w + i * Nb, Nb * sizeof(word));
     }
+
+    free(w);
+    
     return out;
+}
+
+static inline word SubWord(word w) {
+    const uword temp = {w};
+    return s_box[0][temp.bytes[0]] ^
+           s_box[1][temp.bytes[1]] ^
+           s_box[2][temp.bytes[2]] ^
+           s_box[3][temp.bytes[3]];
+}
+
+static inline word RotWord(word w) {
+    return (w << 8) | (w >> 24);
 }

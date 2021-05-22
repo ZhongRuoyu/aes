@@ -1,259 +1,128 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "aes.h"
-#include "io.h"
 
-static byte *verbose_Cipher(unsigned Nb, unsigned Nr, const byte in[], byte **w);
-static byte *verbose_InvCipher(unsigned Nb, unsigned Nr, const byte in[], byte **w);
+static void SubBytes(unsigned Nb, word state[]);
+static void InvSubBytes(unsigned Nb, word state[]);
 
-static void SubBytes(unsigned Nb, byte state[]);
-static void InvSubBytes(unsigned Nb, byte state[]);
-static void ShiftRows(unsigned Nb, byte state[]);
-static void InvShiftRows(unsigned Nb, byte state[]);
-static void MixColumns(unsigned Nb, byte state[]);
-static void InvMixColumns(unsigned Nb, byte state[]);
-static inline void AddRoundKey(unsigned Nb, byte state[], const byte w[]);
+static void ShiftRows(unsigned Nb, word state[]);
+static void InvShiftRows(unsigned Nb, word state[]);
 
-byte *Cipher(unsigned Nb, unsigned Nr, const byte in[], byte **w) {
-    if (verbose) return verbose_Cipher(Nb, Nr, in, w);
+word *Cipher(unsigned Nb, unsigned Nr, const word in[], word **key) {
+    word *state = (word *)malloc(Nb * sizeof(word));
+    memcpy(state, in, Nb * sizeof(word));
 
-    byte *state = (byte *)malloc(4 * Nb * sizeof(byte));
-    memcpy(state, in, 4 * Nb * sizeof(byte));
-
-    AddRoundKey(Nb, state, w[0]);
+    for (unsigned j = 0; j < Nb; ++j) {
+        state[j] ^= key[0][j];
+    }
 
     for (unsigned round = 1; round < Nr; ++round) {
-        SubBytes(Nb, state);
-        ShiftRows(Nb, state);
-        MixColumns(Nb, state);
-        AddRoundKey(Nb, state, w[round]);
+        uword *w = (uword *)malloc(Nb * sizeof(uword));
+        for (unsigned j = 0; j < Nb; ++j) {
+            w[j].word = state[j];
+        }
+        for (unsigned j = 0; j < Nb; ++j) {
+            state[j] =
+                cipher_table[0][w[(j + 0) % Nb].bytes[3]] ^
+                cipher_table[1][w[(j + 1) % Nb].bytes[2]] ^
+                cipher_table[2][w[(j + 2) % Nb].bytes[1]] ^
+                cipher_table[3][w[(j + 3) % Nb].bytes[0]] ^
+                key[round][j];
+        }
+        free(w);
     }
 
     SubBytes(Nb, state);
     ShiftRows(Nb, state);
-    AddRoundKey(Nb, state, w[Nr]);
-
-    return state;
-}
-
-static byte *verbose_Cipher(unsigned Nb, unsigned Nr, const byte in[], byte **w) {
-    printf("CIPHER (ENCRYPT):\n");
-
-    byte *state = (byte *)malloc(4 * Nb * sizeof(byte));
-    memcpy(state, in, 4 * Nb * sizeof(byte));
-
-    printf("round[%2d].input    ", 0);
-    print_block(Nb, state);
-
-    AddRoundKey(Nb, state, w[0]);
-
-    printf("round[%2d].k_sch    ", 0);
-    print_block(Nb, w[0]);
-
-    for (unsigned round = 1; round < Nr; ++round) {
-        printf("round[%2d].start    ", round);
-        print_block(Nb, state);
-
-        SubBytes(Nb, state);
-
-        printf("round[%2d].s_box    ", round);
-        print_block(Nb, state);
-
-        ShiftRows(Nb, state);
-
-        printf("round[%2d].s_row    ", round);
-        print_block(Nb, state);
-
-        MixColumns(Nb, state);
-
-        printf("round[%2d].m_col    ", round);
-        print_block(Nb, state);
-
-        AddRoundKey(Nb, state, w[round]);
-
-        printf("round[%2d].k_sch    ", round);
-        print_block(Nb, w[round]);
+    for (unsigned j = 0; j < Nb; ++j) {
+        state[j] ^= key[Nr][j];
     }
 
-    printf("round[%2d].start    ", Nr);
-    print_block(Nb, state);
-
-    SubBytes(Nb, state);
-
-    printf("round[%2d].s_box    ", Nr);
-    print_block(Nb, state);
-
-    ShiftRows(Nb, state);
-
-    printf("round[%2d].s_row    ", Nr);
-    print_block(Nb, state);
-
-    AddRoundKey(Nb, state, w[Nr]);
-
-    printf("round[%2d].k_sch    ", Nr);
-    print_block(Nb, w[Nr]);
-
-    printf("round[%2d].output   ", Nr);
-    print_block(Nb, state);
-    printf("\n");
-
     return state;
 }
 
-byte *InvCipher(unsigned Nb, unsigned Nr, const byte in[], byte **w) {
-    if (verbose) return verbose_InvCipher(Nb, Nr, in, w);
+word *InvCipher(unsigned Nb, unsigned Nr, const word in[], word **key) {
+    word *state = (word *)malloc(Nb * sizeof(word));
+    memcpy(state, in, Nb * sizeof(word));
 
-    byte *state = (byte *)malloc(4 * Nb * sizeof(byte));
-    memcpy(state, in, 4 * Nb * sizeof(byte));
-
-    AddRoundKey(Nb, state, w[Nr]);
+    for (unsigned j = 0; j < Nb; ++j) {
+        state[j] ^= key[Nr][j];
+    }
 
     for (unsigned round = Nr - 1; round > 0; --round) {
-        InvShiftRows(Nb, state);
-        InvSubBytes(Nb, state);
-        AddRoundKey(Nb, state, w[round]);
-        InvMixColumns(Nb, state);
+        uword *w = (uword *)malloc(Nb * sizeof(uword));
+        for (unsigned j = 0; j < Nb; ++j) {
+            w[j].word = state[j];
+        }
+        for (unsigned j = 0; j < Nb; ++j) {
+            state[j] =
+                inv_cipher_table[0][w[(j + 4) % Nb].bytes[3]] ^
+                inv_cipher_table[1][w[(j + 3) % Nb].bytes[2]] ^
+                inv_cipher_table[2][w[(j + 2) % Nb].bytes[1]] ^
+                inv_cipher_table[3][w[(j + 1) % Nb].bytes[0]] ^
+                key[round][j];
+        }
+        free(w);
     }
 
     InvShiftRows(Nb, state);
     InvSubBytes(Nb, state);
-    AddRoundKey(Nb, state, w[0]);
+    for (unsigned j = 0; j < Nb; ++j) {
+        state[j] ^= key[0][j];
+    }
 
     return state;
 }
 
-static byte *verbose_InvCipher(unsigned Nb, unsigned Nr, const byte in[], byte **w) {
-    printf("INVERSE CIPHER (DECRYPT):\n");
-
-    byte *state = (byte *)malloc(4 * Nb * sizeof(byte));
-    memcpy(state, in, 4 * Nb * sizeof(byte));
-
-    printf("round[%2d].iinput   ", 0);
-    print_block(Nb, state);
-
-    AddRoundKey(Nb, state, w[Nr]);
-
-    printf("round[%2d].ik_sch   ", 0);
-    print_block(Nb, w[Nr]);
-
-    for (unsigned round = Nr - 1; round > 0; --round) {
-        printf("round[%2d].istart   ", Nr - round);
-        print_block(Nb, state);
-
-        InvShiftRows(Nb, state);
-
-        printf("round[%2d].is_row   ", Nr - round);
-        print_block(Nb, state);
-
-        InvSubBytes(Nb, state);
-
-        printf("round[%2d].is_box   ", Nr - round);
-        print_block(Nb, state);
-
-        AddRoundKey(Nb, state, w[round]);
-
-        printf("round[%2d].ik_sch   ", Nr - round);
-        print_block(Nb, w[round]);
-
-        printf("round[%2d].ik_add   ", Nr - round);
-        print_block(Nb, state);
-
-        InvMixColumns(Nb, state);
-    }
-
-    printf("round[%2d].istart   ", Nr);
-    print_block(Nb, state);
-
-    InvShiftRows(Nb, state);
-
-    printf("round[%2d].is_row   ", Nr);
-    print_block(Nb, state);
-
-    InvSubBytes(Nb, state);
-
-    printf("round[%2d].is_box   ", Nr);
-    print_block(Nb, state);
-
-    AddRoundKey(Nb, state, w[0]);
-
-    printf("round[%2d].ik_sch   ", Nr);
-    print_block(Nb, w[0]);
-
-    printf("round[%2d].output   ", Nr);
-    print_block(Nb, state);
-    printf("\n");
-
-    return state;
-}
-
-static void SubBytes(unsigned Nb, byte state[]) {
-    for (unsigned pos = 0; pos < 4 * Nb; ++pos) {
-        state[pos] = s_box[state[pos]];
-    }
-}
-
-static void InvSubBytes(unsigned Nb, byte state[]) {
-    for (unsigned pos = 0; pos < 4 * Nb; ++pos) {
-        state[pos] = inverse_s_box[state[pos]];
-    }
-}
-
-static void ShiftRows(unsigned Nb, byte state[]) {
-    byte *new_state = (byte *)malloc(4 * Nb * sizeof(byte));
-    for (unsigned i = 0; i < 4; ++i) {
-        for (unsigned j = 0; j < Nb; ++j) {
-            new_state[i * Nb + j] = state[i * Nb + (j + i) % Nb];
-        }
-    }
-    memcpy(state, new_state, 4 * Nb * sizeof(byte));
-    free(new_state);
-}
-
-static void InvShiftRows(unsigned Nb, byte state[]) {
-    byte *new_state = (byte *)malloc(4 * Nb * sizeof(byte));
-    for (unsigned i = 0; i < 4; ++i) {
-        for (unsigned j = 0; j < Nb; ++j) {
-            new_state[i * Nb + j] = state[i * Nb + (Nb + j - i) % Nb];
-        }
-    }
-    memcpy(state, new_state, 4 * Nb * sizeof(byte));
-    free(new_state);
-}
-
-static void MixColumns(unsigned Nb, byte state[]) {
-    byte *new_state = (byte *)malloc(4 * Nb * sizeof(byte));
+static void SubBytes(unsigned Nb, word state[]) {
     for (unsigned j = 0; j < Nb; ++j) {
-        for (unsigned i = 0; i < 4; ++i) {
-            new_state[i * Nb + j] =
-                MixColumns_table[(4 - i + 0) % 4][state[0 * Nb + j]] ^
-                MixColumns_table[(4 - i + 1) % 4][state[1 * Nb + j]] ^
-                MixColumns_table[(4 - i + 2) % 4][state[2 * Nb + j]] ^
-                MixColumns_table[(4 - i + 3) % 4][state[3 * Nb + j]];
-        }
+        const uword temp = {state[j]};
+        state[j] =
+            s_box[0][temp.bytes[0]] ^
+            s_box[1][temp.bytes[1]] ^
+            s_box[2][temp.bytes[2]] ^
+            s_box[3][temp.bytes[3]];
     }
-    memcpy(state, new_state, 4 * Nb * sizeof(byte));
-    free(new_state);
 }
 
-static void InvMixColumns(unsigned Nb, byte state[]) {
-    byte *new_state = (byte *)malloc(4 * Nb * sizeof(byte));
+static void InvSubBytes(unsigned Nb, word state[]) {
     for (unsigned j = 0; j < Nb; ++j) {
-        for (unsigned i = 0; i < 4; ++i) {
-            new_state[i * Nb + j] =
-                InvMixColumns_table[(4 - i + 0) % 4][state[0 * Nb + j]] ^
-                InvMixColumns_table[(4 - i + 1) % 4][state[1 * Nb + j]] ^
-                InvMixColumns_table[(4 - i + 2) % 4][state[2 * Nb + j]] ^
-                InvMixColumns_table[(4 - i + 3) % 4][state[3 * Nb + j]];
-        }
+        const uword temp = {state[j]};
+        state[j] =
+            inverse_s_box[0][temp.bytes[0]] ^
+            inverse_s_box[1][temp.bytes[1]] ^
+            inverse_s_box[2][temp.bytes[2]] ^
+            inverse_s_box[3][temp.bytes[3]];
     }
-    memcpy(state, new_state, 4 * Nb * sizeof(byte));
-    free(new_state);
 }
 
-static inline void AddRoundKey(unsigned Nb, byte state[], const byte w[]) {
-    for (unsigned pos = 0; pos < 4 * Nb; ++pos) {
-        state[pos] ^= w[pos];
+static void ShiftRows(unsigned Nb, word state[]) {
+    uword *w = (uword *)malloc(Nb * sizeof(uword));
+    for (unsigned j = 0; j < Nb; ++j) {
+        w[j].word = state[j];
     }
+    for (unsigned j = 0; j < Nb; ++j) {
+        state[j] =
+            w[(j + 0) % Nb].bytes[3] << 24 ^
+            w[(j + 1) % Nb].bytes[2] << 16 ^
+            w[(j + 2) % Nb].bytes[1] << 8 ^
+            w[(j + 3) % Nb].bytes[0] << 0;
+    }
+    free(w);
+}
+
+static void InvShiftRows(unsigned Nb, word state[]) {
+    uword *w = (uword *)malloc(Nb * sizeof(uword));
+    for (unsigned j = 0; j < Nb; ++j) {
+        w[j].word = state[j];
+    }
+    for (unsigned j = 0; j < Nb; ++j) {
+        state[j] =
+            w[(j + 4) % Nb].bytes[3] << 24 ^
+            w[(j + 3) % Nb].bytes[2] << 16 ^
+            w[(j + 2) % Nb].bytes[1] << 8 ^
+            w[(j + 1) % Nb].bytes[0] << 0;
+    }
+    free(w);
 }

@@ -6,6 +6,11 @@
 typedef uint8_t byte;
 typedef uint32_t word;
 
+typedef union uword {
+    word word;
+    byte bytes[4];
+} uword;
+
 typedef enum Mode {
     UNDEFINED,
     CIPHER,
@@ -21,28 +26,26 @@ extern int time_display;
 
 /* bytes.c begin */
 
-byte *to_bytes(word w);
-word to_word(byte b3, byte b2, byte b1, byte b0);
-byte *to_bytes_array(unsigned Nb, const word w[]);
-void transpose_block(unsigned Nb, byte block[]);
-char *block_to_string(unsigned Nb, byte block[]);
+void change_endianness(unsigned Nb, word block[]);
+char *block_to_string(unsigned Nb, word block[]);
 
 /* end bytes.c */
 
 /* cipher.c begin */
 
-byte *Cipher(unsigned Nb, unsigned Nr, const byte in[], byte **w);
-byte *InvCipher(unsigned Nb, unsigned Nr, const byte in[], byte **w);
+word *Cipher(unsigned Nb, unsigned Nr, const word in[], word **w);
+word *InvCipher(unsigned Nb, unsigned Nr, const word in[], word **w);
 
 /* end cipher.c */
 
 /* data.c begin */
 
 extern const word Rcon[];
-extern const byte s_box[256];
-extern const byte inverse_s_box[256];
-extern const byte MixColumns_table[4][256];
-extern const byte InvMixColumns_table[4][256];
+extern const word s_box[4][256];
+extern const word inverse_s_box[4][256];
+extern const word cipher_table[4][256];
+extern const word inv_cipher_table[4][256];
+extern const word InvMixColumns_table[4][256];
 
 /* end data.c */
 
@@ -63,8 +66,7 @@ char *process_hex_string(const char *str);
 
 /* key.c begin */
 
-word *KeyExpansion(unsigned Nb, unsigned Nr, const word key[], unsigned Nk);
-byte **wrap_key(unsigned Nb, unsigned Nr, const word w[], unsigned Nk);
+word **KeyExpansion(unsigned Nb, unsigned Nr, const word key[], unsigned Nk);
 
 /* end key.c */
 

@@ -1,6 +1,5 @@
 #include "io.h"
 
-#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,11 +21,9 @@ void print_multiline(char *str, char delimiter) {
     printf("\n");
 }
 
-void print_block(unsigned Nb, const byte block[]) {
+void print_block(unsigned Nb, const word block[]) {
     for (unsigned j = 0; j < Nb; ++j) {
-        for (unsigned i = 0; i < 4; ++i) {
-            printf("%02x", block[i * 4 + j]);
-        }
+        printf("%08x", block[j]);
     }
     printf("\n");
 }

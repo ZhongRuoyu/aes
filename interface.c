@@ -1,4 +1,4 @@
-// disables deprecation warning for fopen and strncpy
+// disables deprecation warning for fopen
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <ctype.h>
@@ -12,32 +12,33 @@
 static inline unsigned get_Nb();
 static inline unsigned get_Nr(unsigned Nk);
 
-static char *cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, byte **key, byte **in, unsigned block_count);
-static char *inv_cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, byte **key, byte **in, unsigned block_count);
+static char *cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, word **key, word **in, unsigned block_count);
+static char *inv_cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, word **key, word **in, unsigned block_count);
 
-static byte **process_key(unsigned Nb, unsigned Nr, const char *key, unsigned Nk);
+static word **process_key(unsigned Nb, unsigned Nr, const char *key, unsigned Nk);
+static word **inv_process_key(unsigned Nb, unsigned Nr, const char *key, unsigned Nk);
 
 // ISO/IEC 9797-1, padding method 2
-static char *string_bit_padding(char *str);
+static char *string_bit_padding(unsigned Nb, char *str);
 static int remove_string_bit_padding(char *str);
 static int get_block_bit_padding_position(unsigned Nb, byte block[]);
 
 static word *hex_string_to_key(unsigned Nk, const char *str);
-static byte *hex_string_to_block(const char *str);
-static byte **hex_string_to_blocks(char *str, unsigned block_count);
+static word *hex_string_to_block(unsigned Nb, const char *str);
+static word **hex_string_to_blocks(unsigned Nb, char *str, unsigned block_count);
 
 char *cipher_hex(unsigned Nk, const char *key, const char *in) {
     unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
-    byte **key_processed = process_key(Nb, Nr, key, Nk);
+    word **key_processed = process_key(Nb, Nr, key, Nk);
 
     char *in_processed = process_hex_string(in);
-    if (strlen(in_processed) != 32) {
+    if (strlen(in_processed) != 8 * Nb) {
         free(in_processed);
         for (unsigned i = 0; i <= Nr; ++i) free(key_processed[i]);
         free(key_processed);
         error("Incorrect input length.", NULL);
     }
-    byte **in_blocks = hex_string_to_blocks(in_processed, 1);
+    word **in_blocks = hex_string_to_blocks(Nb, in_processed, 1);
     free(in_processed);
 
     char *out = cipher_hex_interface(Nb, Nk, Nr, key_processed, in_blocks, 1);
@@ -52,16 +53,16 @@ char *cipher_hex(unsigned Nk, const char *key, const char *in) {
 
 char *inv_cipher_hex(unsigned Nk, const char *key, const char *in) {
     unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
-    byte **key_processed = process_key(Nb, Nr, key, Nk);
+    word **key_processed = inv_process_key(Nb, Nr, key, Nk);
 
     char *in_processed = process_hex_string(in);
-    if (strlen(in_processed) != 32) {
+    if (strlen(in_processed) != 8 * Nb) {
         free(in_processed);
         for (unsigned i = 0; i <= Nr; ++i) free(key_processed[i]);
         free(key_processed);
         error("Incorrect input length.", NULL);
     }
-    byte **in_blocks = hex_string_to_blocks(in_processed, 1);
+    word **in_blocks = hex_string_to_blocks(Nb, in_processed, 1);
     free(in_processed);
 
     char *out = inv_cipher_hex_interface(Nb, Nk, Nr, key_processed, in_blocks, 1);
@@ -76,12 +77,12 @@ char *inv_cipher_hex(unsigned Nk, const char *key, const char *in) {
 
 char *cipher_hex_multiblock(unsigned Nk, const char *key, const char *in) {
     unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
-    byte **key_processed = process_key(Nb, Nr, key, Nk);
+    word **key_processed = process_key(Nb, Nr, key, Nk);
 
     char *in_processed = process_hex_string(in);
-    char *in_padded = string_bit_padding(in_processed);  // in_processed is reallocated
-    const unsigned block_count = strlen(in_padded) / 32;
-    byte **in_blocks = hex_string_to_blocks(in_padded, block_count);
+    char *in_padded = string_bit_padding(Nb, in_processed);  // in_processed is reallocated
+    const unsigned block_count = strlen(in_padded) / (8 * Nb);
+    word **in_blocks = hex_string_to_blocks(Nb, in_padded, block_count);
     free(in_padded);
 
     char *out = cipher_hex_interface(Nb, Nk, Nr, key_processed, in_blocks, block_count);
@@ -96,18 +97,18 @@ char *cipher_hex_multiblock(unsigned Nk, const char *key, const char *in) {
 
 char *inv_cipher_hex_multiblock(unsigned Nk, const char *key, const char *in) {
     unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
-    byte **key_processed = process_key(Nb, Nr, key, Nk);
+    word **key_processed = inv_process_key(Nb, Nr, key, Nk);
 
     char *in_processed = process_hex_string(in);
     const unsigned n = strlen(in_processed);
-    if (n % 32) {
+    if (n % (8 * Nb)) {
         free(in_processed);
         for (unsigned i = 0; i <= Nr; ++i) free(key_processed[i]);
         free(key_processed);
         error("Incorrect input length.", NULL);
     }
-    const unsigned block_count = n / 32;
-    byte **in_blocks = hex_string_to_blocks(in_processed, block_count);
+    const unsigned block_count = n / (8 * Nb);
+    word **in_blocks = hex_string_to_blocks(Nb, in_processed, block_count);
     free(in_processed);
 
     char *out = inv_cipher_hex_interface(Nb, Nk, Nr, key_processed, in_blocks, block_count);
@@ -127,7 +128,7 @@ char *inv_cipher_hex_multiblock(unsigned Nk, const char *key, const char *in) {
 
 void cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *out_dir) {
     unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
-    byte **key_processed = process_key(Nb, Nr, key, Nk);
+    word **key_processed = process_key(Nb, Nr, key, Nk);
 
     FILE *in_file, *out_file;
     if (!(in_file = fopen(in_dir, "rb"))) {
@@ -143,9 +144,10 @@ void cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *o
         unsigned bytes_read;
 
         while ((bytes_read = fread(buffer, sizeof(byte), 4 * Nb, in_file)) == 4 * Nb) {
-            transpose_block(Nb, buffer);
-            byte *out_buffer = Cipher(Nb, Nr, buffer, key_processed);
-            fwrite(out_buffer, sizeof(byte), 4 * Nb, out_file);
+            change_endianness(Nb, (word *)buffer);
+            word *out_buffer = Cipher(Nb, Nr, (word *)buffer, key_processed);
+            change_endianness(Nb, (word *)out_buffer);
+            fwrite(out_buffer, sizeof(word), Nb, out_file);
             free(out_buffer);
         }
 
@@ -154,9 +156,10 @@ void cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *o
             for (unsigned i = bytes_read + 1; i < 4 * Nb; ++i) {
                 buffer[i] = 0x00;
             }
-            transpose_block(Nb, buffer);
-            byte *out_buffer = Cipher(Nb, Nr, buffer, key_processed);
-            fwrite(out_buffer, sizeof(byte), 4 * Nb, out_file);
+            change_endianness(Nb, (word *)buffer);
+            word *out_buffer = Cipher(Nb, Nr, (word *)buffer, key_processed);
+            change_endianness(Nb, (word *)out_buffer);
+            fwrite(out_buffer, sizeof(word), Nb, out_file);
             free(out_buffer);
         }
 
@@ -172,7 +175,7 @@ void cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *o
 
 void inv_cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *out_dir) {
     unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
-    byte **key_processed = process_key(Nb, Nr, key, Nk);
+    word **key_processed = inv_process_key(Nb, Nr, key, Nk);
 
     FILE *in_file, *out_file;
     if (!(in_file = fopen(in_dir, "rb"))) {
@@ -201,16 +204,18 @@ void inv_cipher_file(unsigned Nk, const char *key, const char *in_dir, const cha
 
         for (unsigned bytes_read = 0; (bytes_read + 4 * Nb) < file_size;) {
             bytes_read += fread(buffer, sizeof(byte), 4 * Nb, in_file);
-            transpose_block(Nb, buffer);
-            byte *out_buffer = InvCipher(Nb, Nr, buffer, key_processed);
-            fwrite(out_buffer, sizeof(byte), 4 * Nb, out_file);
+            change_endianness(Nb, (word *)buffer);
+            word *out_buffer = InvCipher(Nb, Nr, (word *)buffer, key_processed);
+            change_endianness(Nb, (word *)out_buffer);
+            fwrite(out_buffer, sizeof(word), Nb, out_file);
             free(out_buffer);
         }
 
         {
             fread(buffer, sizeof(byte), 4 * Nb, in_file);
-            transpose_block(Nb, buffer);
-            byte *out_buffer = InvCipher(Nb, Nr, buffer, key_processed);
+            change_endianness(Nb, (word *)buffer);
+            byte *out_buffer = (byte *)InvCipher(Nb, Nr, (word *)buffer, key_processed);
+            change_endianness(Nb, (word *)out_buffer);
             int pos = get_block_bit_padding_position(Nb, out_buffer);
             if (pos < 0) {
                 free(buffer);
@@ -268,44 +273,58 @@ static inline unsigned get_Nr(unsigned Nk) {
     return 0;
 }
 
-static char *cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, byte **key, byte **in, unsigned block_count) {
-    char *out = (char *)malloc((block_count * 32 + 1) * sizeof(char));
+static char *cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, word **key, word **in, unsigned block_count) {
+    char *out = (char *)malloc((block_count * 8 * Nb + 1) * sizeof(char));
     for (unsigned i = 0; i < block_count; ++i) {
-        byte *out_bytes = Cipher(Nb, Nr, in[i], key);
+        word *out_bytes = Cipher(Nb, Nr, in[i], key);
         char *out_str = block_to_string(Nb, out_bytes);
         free(out_bytes);
-        memcpy(out + i * 32, out_str, 32 * sizeof(char));
+        memcpy(out + i * 8 * Nb, out_str, 8 * Nb * sizeof(char));
         free(out_str);
     }
-    out[block_count * 32] = '\0';
+    out[block_count * 8 * Nb] = '\0';
     return out;
 }
 
-static char *inv_cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, byte **key, byte **in, unsigned block_count) {
-    char *out = (char *)malloc((block_count * 32 + 1) * sizeof(char));
+static char *inv_cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, word **key, word **in, unsigned block_count) {
+    char *out = (char *)malloc((block_count * 8 * Nb + 1) * sizeof(char));
     for (unsigned i = 0; i < block_count; ++i) {
-        byte *out_bytes = InvCipher(Nb, Nr, in[i], key);
+        word *out_bytes = InvCipher(Nb, Nr, in[i], key);
         char *out_str = block_to_string(Nb, out_bytes);
         free(out_bytes);
-        memcpy(out + i * 32, out_str, 32 * sizeof(char));
+        memcpy(out + i * 8 * Nb, out_str, 8 * Nb * sizeof(char));
         free(out_str);
     }
-    out[block_count * 32] = '\0';
+    out[block_count * 8 * Nb] = '\0';
     return out;
 }
 
-static byte **process_key(unsigned Nb, unsigned Nr, const char *key, unsigned Nk) {
+static word **process_key(unsigned Nb, unsigned Nr, const char *key, unsigned Nk) {
     word *key_words = hex_string_to_key(Nk, key);
-    word *key_expanded = KeyExpansion(Nb, Nr, key_words, Nk);
+    word **key_expanded = KeyExpansion(Nb, Nr, key_words, Nk);
     free(key_words);
-    byte **key_processed = wrap_key(Nb, Nr, key_expanded, Nk);
-    free(key_expanded);
-    return key_processed;
+    return key_expanded;
 }
 
-static char *string_bit_padding(char *str) {
+static word **inv_process_key(unsigned Nb, unsigned Nr, const char *key, unsigned Nk) {
+    word **key_expanded = process_key(Nb, Nr, key, Nk);
+    const word(*T)[256] = InvMixColumns_table;
+    for (unsigned round = 1; round < Nr; ++round) {
+        for (unsigned j = 0; j < Nb; ++j) {
+            const uword w = {key_expanded[round][j]};
+            key_expanded[round][j] =
+                T[0][w.bytes[3]] ^
+                T[1][w.bytes[2]] ^
+                T[2][w.bytes[1]] ^
+                T[3][w.bytes[0]];
+        }
+    }
+    return key_expanded;
+}
+
+static char *string_bit_padding(unsigned Nb, char *str) {
     const unsigned n = strlen(str);
-    unsigned padded_length = ((n / 32) + 1) * 32;
+    unsigned padded_length = ((n / (8 * Nb)) + 1) * (8 * Nb);
     char *new_str = (char *)realloc(str, (padded_length + 1) * sizeof(char));
     new_str[n] = '8';  // 0b10000000
     for (unsigned i = n + 1; i < padded_length; ++i) new_str[i] = '0';
@@ -339,33 +358,28 @@ static word *hex_string_to_key(unsigned Nk, const char *str) {
     word *key = (word *)malloc(Nk * sizeof(word *));
     for (unsigned i = 0; i < Nk; ++i) {
         char buffer[9];
-        strncpy(buffer, str + i * 8, 8);
+        memcpy(buffer, str + i * 8, 8 * sizeof(char));
         buffer[8] = '\0';
         key[i] = strtoul(buffer, NULL, 16);
     }
     return key;
 }
 
-static byte *hex_string_to_block(const char *str) {
-    byte *block = (byte *)malloc(16 * sizeof(byte));
-    for (unsigned j = 0; j < 4; ++j) {
-        for (unsigned i = 0; i < 4; ++i) {
-            char buffer[3];
-            strncpy(buffer, str + j * 8 + i * 2, 2);
-            buffer[2] = '\0';
-            block[i * 4 + j] = strtoul(buffer, NULL, 16);
-        }
+static word *hex_string_to_block(unsigned Nb, const char *str) {
+    word *block = (word *)malloc(Nb * sizeof(word));
+    for (unsigned j = 0; j < Nb; ++j) {
+        char buffer[9];
+        memcpy(buffer, str + j * 8, 8 * sizeof(char));
+        buffer[8] = '\0';
+        block[j] = strtoul(buffer, NULL, 16);
     }
     return block;
 }
 
-static byte **hex_string_to_blocks(char *str, unsigned block_count) {
-    byte **blocks = (byte **)malloc(block_count * sizeof(byte *));
+static word **hex_string_to_blocks(unsigned Nb, char *str, unsigned block_count) {
+    word **blocks = (word **)malloc(block_count * sizeof(word *));
     for (unsigned curr_block = 0; curr_block < block_count; ++curr_block) {
-        char buffer[33];
-        strncpy(buffer, str + curr_block * 32, 32);
-        buffer[32] = '\0';
-        blocks[curr_block] = hex_string_to_block(buffer);
+        blocks[curr_block] = hex_string_to_block(Nb, str + curr_block * 8 * Nb);
     }
     return blocks;
 }
