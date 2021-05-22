@@ -76,7 +76,7 @@ void usage(const char *basename) {
     exit(EXIT_FAILURE);
 }
 
-int main(int argc, const char **argv) {
+int main(int argc, char **argv) {
     clock_t begin = clock();
 
     const char *basename = get_basename(argv[0]);
@@ -86,11 +86,11 @@ int main(int argc, const char **argv) {
     Mode mode = UNDEFINED;
     InputMode input_mode = INPUT_UNDEFINED;
     KeyMode key_mode = KEY_UNDEFINED;
-    const char *in_str = NULL;
-    const char *in_dir = NULL;
-    const char *out_dir = NULL;
-    const char *key_dir = NULL;
-    const char *key = NULL;
+    char *in_str = NULL;
+    char *in_dir = NULL;
+    char *out_dir = NULL;
+    char *key_dir = NULL;
+    char *key = NULL;
 
     for (unsigned i = 1; i < argc; ++i) {
         if (strcmp(argv[i], "-e") == 0) {
@@ -153,7 +153,7 @@ int main(int argc, const char **argv) {
         key = read_from_file(key_dir);
     }
     char *key_processed = process_hex_string(key);
-    if (key_mode == KEY_FILE) free((void *)key);
+    if (key_mode == KEY_FILE) free(key);
     unsigned Nk;
     switch (strlen(key_processed)) {
         case 32: {
