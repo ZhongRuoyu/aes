@@ -12,8 +12,8 @@ void error(const char *msg, const char *from) {
 }
 
 void print_multiline(char *str, char delimiter) {
-    unsigned output_len = strlen(str);
-    unsigned pos = 0;
+    size_t output_len = strlen(str);
+    size_t pos = 0;
     for (; pos + 32 < output_len; pos += 32) {
         printf("%.32s%c", str + pos, delimiter);
     }
