@@ -145,7 +145,7 @@ void cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *o
         while ((bytes_read = fread(buffer, sizeof(byte), 4 * Nb, in_file)) == 4 * Nb) {
             change_endianness(Nb, (word *)buffer);
             word *out_buffer = Cipher(Nb, Nr, (word *)buffer, key_processed);
-            change_endianness(Nb, (word *)out_buffer);
+            change_endianness(Nb, out_buffer);
             fwrite(out_buffer, sizeof(word), Nb, out_file);
             free(out_buffer);
         }
