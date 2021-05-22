@@ -25,6 +25,7 @@ static int get_block_padding_position(unsigned Nb, byte block[]);
 
 static word *hex_string_to_block(unsigned Nb, const char *str);
 static word **hex_string_to_blocks(unsigned Nb, char *str, size_t block_count);
+static char *block_to_string(unsigned Nb, word block[]);
 
 char *cipher_hex(unsigned Nk, const char *key, const char *in) {
     unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
@@ -368,4 +369,13 @@ static word **hex_string_to_blocks(unsigned Nb, char *str, size_t block_count) {
         blocks[curr_block] = hex_string_to_block(Nb, str + curr_block * 8 * Nb);
     }
     return blocks;
+}
+
+static char *block_to_string(unsigned Nb, word block[]) {
+    char *str = (char *)malloc((8 * Nb + 1) * sizeof(char));
+    for (unsigned j = 0; j < Nb; ++j) {
+        snprintf(str + j * 8, 9, "%08x", block[j]);
+    }
+    // the terminating null character is handled by the last snprintf() call
+    return str;
 }

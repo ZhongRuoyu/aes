@@ -27,7 +27,6 @@ extern int time_display;
 /* bytes.c begin */
 
 void change_endianness(unsigned Nb, word block[]);
-char *block_to_string(unsigned Nb, word block[]);
 
 /* end bytes.c */
 
