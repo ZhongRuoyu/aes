@@ -56,8 +56,9 @@ void usage(const char *basename) {
         "                    string.\n"
         "          -m    Multi-block mode: encrypts the hexadecimal string with no \n"
         "                    length limit. <hex-string> must be a valid hexadecimal \n"
-        "                    string.\n"
-        "          -f    File mode: encrypts the given file. <in> must be a valid path \n"
+        "                    string. Deprecation warning: multi-block mode is \n"
+        "                    deprecated and will be removed in the next release.\n"
+        "          -f    File mode: encrypts the file given. <in> must be a valid path \n"
         "                    to an existing file with read access. <out> must be a \n"
         "                    valid path to a file with write access. If the output file \n"
         "                    already exists, it is overwritten; otherwise, it is \n"
@@ -119,6 +120,10 @@ int main(int argc, char **argv) {
             input_mode = MULTI_BLOCK_INPUT;
             if (++i == argc) error("No input string.", NULL);
             in_str = argv[i];
+            fprintf(stderr,
+                    "Deprecation warning: multi-block mode is deprecated and will be removed in \n"
+                    "the next release.\n"
+                    "\n");
         } else if (strcmp(argv[i], "-f") == 0) {
             if (input_mode != INPUT_UNDEFINED) error("Only one input mode can be specified.", NULL);
             input_mode = FILE_INPUT;
