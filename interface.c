@@ -21,11 +21,11 @@ static word **hex_string_to_expanded_inv_key(unsigned Nb, unsigned Nr, const cha
 // ISO/IEC 9797-1, padding method 2
 static char *string_padding(unsigned Nb, const char *str);
 static int remove_string_padding(char *str);
-static int get_block_padding_position(unsigned Nb, byte block[]);
+static int get_block_padding_position(unsigned Nb, const byte block[]);
 
 static word *hex_string_to_block(unsigned Nb, const char *str);
-static word **hex_string_to_blocks(unsigned Nb, char *str, size_t block_count);
-static char *block_to_string(unsigned Nb, word block[]);
+static word **hex_string_to_blocks(unsigned Nb, const char *str, size_t block_count);
+static char *block_to_string(unsigned Nb, const word block[]);
 
 char *cipher_hex(unsigned Nk, const char *key, const char *in) {
     unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
@@ -344,7 +344,7 @@ static int remove_string_padding(char *str) {
     return 1;
 }
 
-static int get_block_padding_position(unsigned Nb, byte block[]) {
+static int get_block_padding_position(unsigned Nb, const byte block[]) {
     for (signed i = 4 * Nb - 1; i >= 0; --i) {
         if (block[i] != 0x00) {
             if (block[i] != 0x80) return -1;
@@ -365,7 +365,7 @@ static word *hex_string_to_block(unsigned Nb, const char *str) {
     return block;
 }
 
-static word **hex_string_to_blocks(unsigned Nb, char *str, size_t block_count) {
+static word **hex_string_to_blocks(unsigned Nb, const char *str, size_t block_count) {
     word **blocks = (word **)malloc(block_count * sizeof(word *));
     for (size_t i = 0; i < block_count; ++i) {
         blocks[i] = hex_string_to_block(Nb, str + i * 8 * Nb);
@@ -373,7 +373,7 @@ static word **hex_string_to_blocks(unsigned Nb, char *str, size_t block_count) {
     return blocks;
 }
 
-static char *block_to_string(unsigned Nb, word block[]) {
+static char *block_to_string(unsigned Nb, const word block[]) {
     char *str = (char *)malloc((8 * Nb + 1) * sizeof(char));
     for (unsigned j = 0; j < Nb; ++j) {
         snprintf(str + j * 8, 9, "%08x", block[j]);

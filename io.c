@@ -11,7 +11,7 @@ void error(const char *msg, const char *from) {
     exit(EXIT_FAILURE);
 }
 
-void print_multiline(char *str, char delimiter) {
+void print_multiline(const char *str, char delimiter) {
     size_t output_len = strlen(str);
     size_t pos = 0;
     for (; pos + 32 < output_len; pos += 32) {
