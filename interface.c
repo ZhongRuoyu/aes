@@ -332,7 +332,7 @@ static char *string_padding(unsigned Nb, char *str) {
 
 static int remove_string_padding(char *str) {
     const size_t str_len = strlen(str);
-    for (signed i = str_len - 1; i >= 0; --i) {
+    for (size_t i = str_len - 1; i != -1; --i) {
         if (str[i] != '0') {
             if (str[i] != '8') return 1;
             str[i] = '\0';
