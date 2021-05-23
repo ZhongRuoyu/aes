@@ -18,12 +18,10 @@ void print_multiline(const char *str, char delimiter) {
         printf("%.32s%c", str + pos, delimiter);
     }
     printf("%s\n", str + pos);
-    printf("\n");
 }
 
 void print_block(unsigned Nb, const word block[]) {
     for (unsigned j = 0; j < Nb; ++j) {
         printf("%08x", block[j]);
     }
-    printf("\n");
 }

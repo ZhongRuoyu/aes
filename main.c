@@ -184,12 +184,14 @@ int main(int argc, char **argv) {
         case SINGLE_BLOCK_INPUT: {
             out = (mode == CIPHER ? cipher_hex : inv_cipher_hex)(Nk, key_processed, in_str);
             print_multiline(out, '\n');
+            printf("\n");
             free(out);
             break;
         }
         case MULTI_BLOCK_INPUT: {
             out = (mode == CIPHER ? cipher_hex_multiblock : inv_cipher_hex_multiblock)(Nk, key_processed, in_str);
             print_multiline(out, '\n');
+            printf("\n");
             free(out);
             break;
         }
