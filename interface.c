@@ -19,7 +19,7 @@ static word **hex_string_to_expanded_key(unsigned Nb, unsigned Nr, const char *k
 static word **hex_string_to_expanded_inv_key(unsigned Nb, unsigned Nr, const char *key, unsigned Nk);
 
 // ISO/IEC 9797-1, padding method 2
-static char *string_padding(unsigned Nb, char *str);
+static char *string_padding(unsigned Nb, const char *str);
 static int remove_string_padding(char *str);
 static int get_block_padding_position(unsigned Nb, byte block[]);
 
@@ -77,7 +77,8 @@ char *cipher_hex_multiblock(unsigned Nk, const char *key, const char *in) {
     unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
 
     char *in_processed = process_hex_string(in);
-    char *in_padded = string_padding(Nb, in_processed);  // in_processed is reallocated
+    char *in_padded = string_padding(Nb, in_processed);
+    free(in_processed);
     const size_t block_count = strlen(in_padded) / (8 * Nb);
     word **in_blocks = hex_string_to_blocks(Nb, in_padded, block_count);
     free(in_padded);
@@ -320,10 +321,11 @@ static word **hex_string_to_expanded_inv_key(unsigned Nb, unsigned Nr, const cha
     return key_expanded;
 }
 
-static char *string_padding(unsigned Nb, char *str) {
+static char *string_padding(unsigned Nb, const char *str) {
     const size_t n = strlen(str);
     size_t padded_length = ((n / (8 * Nb)) + 1) * (8 * Nb);
-    char *new_str = (char *)realloc(str, (padded_length + 1) * sizeof(char));
+    char *new_str = (char *)malloc((padded_length + 1) * sizeof(char));
+    memcpy(new_str, str, n * sizeof(char));
     new_str[n] = '8';
     for (size_t i = n + 1; i < padded_length; ++i) new_str[i] = '0';
     new_str[padded_length] = '\0';
