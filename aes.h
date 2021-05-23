@@ -32,8 +32,8 @@ void change_endianness(unsigned Nb, word block[]);
 
 /* cipher.c begin */
 
-word *Cipher(unsigned Nb, unsigned Nr, const word in[], word **w);
-word *InvCipher(unsigned Nb, unsigned Nr, const word in[], word **w);
+word *Cipher(unsigned Nb, unsigned Nr, const word in[], word **key);
+word *InvCipher(unsigned Nb, unsigned Nr, const word in[], word **key);
 
 /* end cipher.c */
 

@@ -139,30 +139,30 @@ void cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *o
     word **key_processed = hex_string_to_expanded_key(Nb, Nr, key, Nk);
 
     {
-        byte *buffer = (byte *)malloc(4 * Nb * sizeof(byte));
+        byte *in_buffer = (byte *)malloc(4 * Nb * sizeof(byte));
         size_t bytes_read = 0;
 
-        while ((bytes_read = fread(buffer, sizeof(byte), 4 * Nb, in_file)) == 4 * Nb) {
-            change_endianness(Nb, (word *)buffer);
-            word *out_buffer = Cipher(Nb, Nr, (word *)buffer, key_processed);
+        while ((bytes_read = fread(in_buffer, sizeof(byte), 4 * Nb, in_file)) == 4 * Nb) {
+            change_endianness(Nb, (word *)in_buffer);
+            word *out_buffer = Cipher(Nb, Nr, (word *)in_buffer, key_processed);
             change_endianness(Nb, out_buffer);
             fwrite(out_buffer, sizeof(word), Nb, out_file);
             free(out_buffer);
         }
 
         {
-            buffer[bytes_read] = 0x80;
+            in_buffer[bytes_read] = 0x80;
             for (size_t i = bytes_read + 1; i < 4 * Nb; ++i) {
-                buffer[i] = 0x00;
+                in_buffer[i] = 0x00;
             }
-            change_endianness(Nb, (word *)buffer);
-            word *out_buffer = Cipher(Nb, Nr, (word *)buffer, key_processed);
+            change_endianness(Nb, (word *)in_buffer);
+            word *out_buffer = Cipher(Nb, Nr, (word *)in_buffer, key_processed);
             change_endianness(Nb, out_buffer);
             fwrite(out_buffer, sizeof(word), Nb, out_file);
             free(out_buffer);
         }
 
-        free(buffer);
+        free(in_buffer);
     }
 
     for (unsigned i = 0; i <= Nr; ++i) free(key_processed[i]);
@@ -194,24 +194,24 @@ void inv_cipher_file(unsigned Nk, const char *key, const char *in_dir, const cha
     word **key_processed = hex_string_to_expanded_inv_key(Nb, Nr, key, Nk);
 
     {
-        byte *buffer = (byte *)malloc(4 * Nb * sizeof(byte));
+        byte *in_buffer = (byte *)malloc(4 * Nb * sizeof(byte));
         size_t bytes_read = 0;
 
-        while ((bytes_read += fread(buffer, sizeof(byte), 4 * Nb, in_file)) < file_size) {
-            change_endianness(Nb, (word *)buffer);
-            word *out_buffer = InvCipher(Nb, Nr, (word *)buffer, key_processed);
+        while ((bytes_read += fread(in_buffer, sizeof(byte), 4 * Nb, in_file)) < file_size) {
+            change_endianness(Nb, (word *)in_buffer);
+            word *out_buffer = InvCipher(Nb, Nr, (word *)in_buffer, key_processed);
             change_endianness(Nb, out_buffer);
             fwrite(out_buffer, sizeof(word), Nb, out_file);
             free(out_buffer);
         }
 
         {
-            change_endianness(Nb, (word *)buffer);
-            byte *out_buffer = (byte *)InvCipher(Nb, Nr, (word *)buffer, key_processed);
+            change_endianness(Nb, (word *)in_buffer);
+            byte *out_buffer = (byte *)InvCipher(Nb, Nr, (word *)in_buffer, key_processed);
             change_endianness(Nb, (word *)out_buffer);
             int pos = get_block_padding_position(Nb, out_buffer);
             if (pos < 0) {
-                free(buffer);
+                free(in_buffer);
                 free(out_buffer);
                 for (unsigned i = 0; i <= Nr; ++i) free(key_processed[i]);
                 free(key_processed);
@@ -224,7 +224,7 @@ void inv_cipher_file(unsigned Nk, const char *key, const char *in_dir, const cha
             free(out_buffer);
         }
 
-        free(buffer);
+        free(in_buffer);
     }
 
     for (unsigned i = 0; i <= Nr; ++i) free(key_processed[i]);
@@ -324,15 +324,15 @@ static char *string_padding(unsigned Nb, char *str) {
     const size_t n = strlen(str);
     size_t padded_length = ((n / (8 * Nb)) + 1) * (8 * Nb);
     char *new_str = (char *)realloc(str, (padded_length + 1) * sizeof(char));
-    new_str[n] = '8';  // 0b10000000
+    new_str[n] = '8';
     for (size_t i = n + 1; i < padded_length; ++i) new_str[i] = '0';
     new_str[padded_length] = '\0';
     return new_str;
 }
 
 static int remove_string_padding(char *str) {
-    const size_t n = strlen(str);
-    for (signed i = n - 1; i >= 0; --i) {
+    const size_t str_len = strlen(str);
+    for (signed i = str_len - 1; i >= 0; --i) {
         if (str[i] != '0') {
             if (str[i] != '8') return 1;
             str[i] = '\0';
@@ -365,8 +365,8 @@ static word *hex_string_to_block(unsigned Nb, const char *str) {
 
 static word **hex_string_to_blocks(unsigned Nb, char *str, size_t block_count) {
     word **blocks = (word **)malloc(block_count * sizeof(word *));
-    for (size_t curr_block = 0; curr_block < block_count; ++curr_block) {
-        blocks[curr_block] = hex_string_to_block(Nb, str + curr_block * 8 * Nb);
+    for (size_t i = 0; i < block_count; ++i) {
+        blocks[i] = hex_string_to_block(Nb, str + i * 8 * Nb);
     }
     return blocks;
 }
