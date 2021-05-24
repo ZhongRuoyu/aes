@@ -9,7 +9,6 @@
 #include "aes.h"
 #include "io.h"
 
-int verbose = 0;
 int time_display = 0;
 
 typedef enum InputMode {
@@ -38,7 +37,7 @@ static char *read_from_file(const char *filename);
 void usage(const char *basename) {
     printf(
         "Usage:\n"
-        "    %s {-e|-d} [-v] [-t] { (-s|-m) <hex-string> | -f <in> <out> } { -k <key> | -kfile <file> }\n"
+        "    %s {-e|-d} [-t] { (-s|-m) <hex-string> | -f <in> <out> } { -k <key> | -kfile <file> }\n"
         "    %s {-h|--help}\n"
         "\n"
         "Options:\n"
@@ -46,10 +45,6 @@ void usage(const char *basename) {
         "                    algorithm.\n"
         "          -d    Decryption (Inverse Cipher) mode: decrypts information with \n"
         "                    the AES algorithm.\n"
-        "          -v    Verbose output: enables display of cipher procedure. \n"
-        "                    Deprecation warning: verbose output is no longer \n"
-        "                    supported. The option -v will be removed in the next \n"
-        "                    release.\n"
         "          -t    Time display: displays time elapsed when finished.\n"
         "          -s    Single-block mode: encrypts the single-block hexadecimal \n"
         "                    string. <hex-string> must be a valid 128-bit hexadecimal \n"
@@ -100,13 +95,6 @@ int main(int argc, char **argv) {
         } else if (strcmp(argv[i], "-d") == 0) {
             if (mode != UNDEFINED) error("Only one cipher mode can be specified.", NULL);
             mode = INVCIPHER;
-        } else if (strcmp(argv[i], "-v") == 0) {
-            if (verbose != 0) error("-v can only be specified once.", NULL);
-            verbose = 1;
-            fprintf(stderr,
-                    "Deprecation warning: verbose output is no longer supported. The option -v will \n"
-                    "be removed in the next release.\n"
-                    "\n");
         } else if (strcmp(argv[i], "-t") == 0) {
             if (time_display != 0) error("-t can only be specified once.", NULL);
             time_display = 1;

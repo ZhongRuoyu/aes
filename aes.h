@@ -19,7 +19,6 @@ typedef enum Mode {
 
 /* main.c begin */
 
-extern int verbose;
 extern int time_display;
 
 /* end main.c */
