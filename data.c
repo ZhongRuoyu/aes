@@ -1,7 +1,8 @@
 #include "aes.h"
 
 const word Rcon[] = {
-    0x00000000,  // included for indexing simplicity
+    // Rcon[0] is included for indexing simplicity
+    0x00000000,
     0x01000000,
     0x02000000,
     0x04000000,
@@ -12,6 +13,25 @@ const word Rcon[] = {
     0x80000000,
     0x1b000000,
     0x36000000,
+    0x6c000000,
+    0xd8000000,
+    0xab000000,
+    0x4d000000,
+    0x9a000000,
+    0x2f000000,
+    0x5e000000,
+    0xbc000000,
+    0x63000000,
+    0xc6000000,
+    0x97000000,
+    0x35000000,
+    0x6a000000,
+    0xd4000000,
+    0xb3000000,
+    0x7d000000,
+    0xfa000000,
+    0xef000000,
+    0xc5000000,
 };
 
 const word s_box[4][256] = {
