@@ -52,9 +52,6 @@ extern const word InvMixColumns_table[4][256];
 char *cipher_hex(unsigned Nb, unsigned Nk, const char *key, const char *in);
 char *inv_cipher_hex(unsigned Nb, unsigned Nk, const char *key, const char *in);
 
-char *cipher_hex_multiblock(unsigned Nb, unsigned Nk, const char *key, const char *in);
-char *inv_cipher_hex_multiblock(unsigned Nb, unsigned Nk, const char *key, const char *in);
-
 void cipher_file(unsigned Nb, unsigned Nk, const char *key, const char *in_dir, const char *out_dir);
 void inv_cipher_file(unsigned Nb, unsigned Nk, const char *key, const char *in_dir, const char *out_dir);
 

@@ -2,13 +2,7 @@
 
 `AES` is an implementation of the [Advanced Encryption Standard (AES)](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard) in C, in accordance with the [Standard](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf) published in 2001 and the [AES submission document on Rijndael](https://csrc.nist.gov/csrc/media/projects/cryptographic-standards-and-guidelines/documents/aes-development/rijndael-ammended.pdf) originally published in 1999.
 
-`AES` supports encryption and decryption of the following:
-
-- Single-block (128-bit) hexadecimal strings,
-- Multi-block hexadecimal strings, i.e. ones of arbitrary length,
-- Files.
-
-For byte padding for multi-block hexadecimal strings and files, `AES` uses the padding method 2 from [ISO/IEC 9797-1](https://en.wikipedia.org/wiki/ISO/IEC_9797-1).
+`AES` supports encryption and decryption of single-block (128-bit) hexadecimal strings and files. In terms of byte padding for file encryption/decryption, `AES` uses the padding method 2 from [ISO/IEC 9797-1](https://en.wikipedia.org/wiki/ISO/IEC_9797-1).
 
 All the "flavours" of the algorithm, i.e. AES-128, AES-192, and AES-256, are supported. `AES` determines the algorithm by the length of the key provided.
 

@@ -2,22 +2,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "aes.h"
 
 void error(const char *msg, const char *from) {
     fprintf(stderr, "Error: %s%s\n\n", from ? from : "", msg);
     exit(EXIT_FAILURE);
-}
-
-void print_multiline(unsigned Nb, const char *str, char delimiter) {
-    size_t output_len = strlen(str);
-    size_t pos = 0;
-    for (; pos + 8 * Nb < output_len; pos += 8 * Nb) {
-        printf("%.*s%c", 8 * Nb, str + pos, delimiter);
-    }
-    printf("%s\n", str + pos);
 }
 
 void print_block(unsigned Nb, const word block[]) {

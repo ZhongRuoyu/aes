@@ -13,8 +13,7 @@ int time_display = 0;
 
 typedef enum InputMode {
     INPUT_UNDEFINED,
-    SINGLE_BLOCK_INPUT,
-    MULTI_BLOCK_INPUT,
+    HEX_STRING_INPUT,
     FILE_INPUT,
 } InputMode;
 
@@ -37,7 +36,7 @@ static char *read_from_file(const char *filename);
 void usage(const char *basename) {
     printf(
         "Usage:\n"
-        "    %s {-e|-d} [-t] { (-s|-m) <hex-string> | -f <in> <out> } { -k <key> | -kfile <file> }\n"
+        "    %s {-e|-d} [-t] { -s <hex-string> | -f <in> <out> } { -k <key> | -kfile <file> }\n"
         "    %s {-h|--help}\n"
         "\n"
         "Options:\n"
@@ -46,13 +45,9 @@ void usage(const char *basename) {
         "          -d    Decryption (Inverse Cipher) mode: decrypts information with \n"
         "                    the AES algorithm.\n"
         "          -t    Time display: displays time elapsed when finished.\n"
-        "          -s    Single-block mode: encrypts the single-block hexadecimal \n"
-        "                    string. <hex-string> must be a valid 128-bit hexadecimal \n"
-        "                    string.\n"
-        "          -m    Multi-block mode: encrypts the hexadecimal string with no \n"
-        "                    length limit. <hex-string> must be a valid hexadecimal \n"
-        "                    string. Deprecation warning: multi-block mode is \n"
-        "                    deprecated and will be removed in the next release.\n"
+        "          -s    Hexadecimal string mode: encrypts the single-block hexadecimal \n"
+        "                    string given. <hex-string> must be a valid 128-bit \n"
+        "                    hexadecimal string.\n"
         "          -f    File mode: encrypts the file given. <in> must be a valid path \n"
         "                    to an existing file with read access. <out> must be a \n"
         "                    valid path to a file with write access. If the output file \n"
@@ -100,18 +95,9 @@ int main(int argc, char **argv) {
             time_display = 1;
         } else if (strcmp(argv[i], "-s") == 0) {
             if (input_mode != INPUT_UNDEFINED) error("Only one input mode can be specified.", NULL);
-            input_mode = SINGLE_BLOCK_INPUT;
+            input_mode = HEX_STRING_INPUT;
             if (++i == argc) error("No input string.", NULL);
             in_str = argv[i];
-        } else if (strcmp(argv[i], "-m") == 0) {
-            if (input_mode != INPUT_UNDEFINED) error("Only one input mode can be specified.", NULL);
-            input_mode = MULTI_BLOCK_INPUT;
-            if (++i == argc) error("No input string.", NULL);
-            in_str = argv[i];
-            fprintf(stderr,
-                    "Deprecation warning: multi-block mode is deprecated and will be removed in \n"
-                    "the next release.\n"
-                    "\n");
         } else if (strcmp(argv[i], "-f") == 0) {
             if (input_mode != INPUT_UNDEFINED) error("Only one input mode can be specified.", NULL);
             input_mode = FILE_INPUT;
@@ -170,17 +156,9 @@ int main(int argc, char **argv) {
 
     char *out = NULL;
     switch (input_mode) {
-        case SINGLE_BLOCK_INPUT: {
+        case HEX_STRING_INPUT: {
             out = (mode == CIPHER ? cipher_hex : inv_cipher_hex)(Nb, Nk, key_processed, in_str);
-            print_multiline(Nb, out, '\n');
-            printf("\n");
-            free(out);
-            break;
-        }
-        case MULTI_BLOCK_INPUT: {
-            out = (mode == CIPHER ? cipher_hex_multiblock : inv_cipher_hex_multiblock)(Nb, Nk, key_processed, in_str);
-            print_multiline(Nb, out, '\n');
-            printf("\n");
+            printf("%s\n\n", out);
             free(out);
             break;
         }
