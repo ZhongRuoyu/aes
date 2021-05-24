@@ -1,4 +1,9 @@
+*
+!/**/
+!*.*
+
 *.exe
 *.out
 
 /.vscode/
+/test/
