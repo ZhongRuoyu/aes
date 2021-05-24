@@ -17,7 +17,6 @@ static char *inv_cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, wor
 static word **hex_string_to_expanded_key(unsigned Nb, unsigned Nr, const char *key, unsigned Nk);
 static word **hex_string_to_expanded_inv_key(unsigned Nb, unsigned Nr, const char *key, unsigned Nk);
 
-// ISO/IEC 9797-1, padding method 2
 static int get_block_padding_position(unsigned Nb, const byte block[]);
 
 static word *hex_string_to_block(unsigned Nb, const char *str);

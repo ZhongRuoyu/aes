@@ -17,26 +17,26 @@ typedef enum Mode {
     INVCIPHER,
 } Mode;
 
-/* main.c begin */
+// main.c begin
 
 extern int time_display;
 
-/* end main.c */
+// end main.c
 
-/* bytes.c begin */
+// bytes.c begin
 
 void change_endianness(unsigned Nb, word block[]);
 
-/* end bytes.c */
+// end bytes.c
 
-/* cipher.c begin */
+// cipher.c begin
 
 word *Cipher(unsigned Nb, unsigned Nr, const word in[], word **key);
 word *InvCipher(unsigned Nb, unsigned Nr, const word in[], word **key);
 
-/* end cipher.c */
+// end cipher.c
 
-/* data.c begin */
+// data.c begin
 
 extern const word Rcon[];
 extern const word s_box[4][256];
@@ -45,9 +45,9 @@ extern const word cipher_table[4][256];
 extern const word inv_cipher_table[4][256];
 extern const word InvMixColumns_table[4][256];
 
-/* end data.c */
+// end data.c
 
-/* interface.c begin */
+// interface.c begin
 
 char *cipher_hex(unsigned Nb, unsigned Nk, const char *key, const char *in);
 char *inv_cipher_hex(unsigned Nb, unsigned Nk, const char *key, const char *in);
@@ -57,12 +57,12 @@ void inv_cipher_file(unsigned Nb, unsigned Nk, const char *key, const char *in_d
 
 char *process_hex_string(const char *str);
 
-/* end interface.c */
+// end interface.c
 
-/* key.c begin */
+// key.c begin
 
 word **KeyExpansion(unsigned Nb, unsigned Nr, const word key[], unsigned Nk);
 
-/* end key.c */
+// end key.c
 
 #endif  // AES_H_
