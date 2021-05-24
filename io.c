@@ -22,6 +22,9 @@ void print_multiline(const char *str, char delimiter) {
 
 void print_block(unsigned Nb, const word block[]) {
     for (unsigned j = 0; j < Nb; ++j) {
-        printf("%08x", block[j]);
+        const uword t = {block[j]};
+        for (unsigned k = 0; k < 4; ++k) {
+            printf("%02x", t.bytes[k]);
+        }
     }
 }

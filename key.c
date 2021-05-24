@@ -25,18 +25,18 @@ word **KeyExpansion(unsigned Nb, unsigned Nr, const word key[], unsigned Nk) {
     }
 
     free(w);
-    
+
     return out;
 }
 
 static inline word SubWord(word w) {
     const uword temp = {w};
-    return s_box[3][temp.bytes[0]] ^
-           s_box[2][temp.bytes[1]] ^
-           s_box[1][temp.bytes[2]] ^
-           s_box[0][temp.bytes[3]];
+    return s_box[0][temp.bytes[0]] ^
+           s_box[1][temp.bytes[1]] ^
+           s_box[2][temp.bytes[2]] ^
+           s_box[3][temp.bytes[3]];
 }
 
 static inline word RotWord(word w) {
-    return (w << 8) | (w >> 24);
+    return (w << 24) | (w >> 8);
 }

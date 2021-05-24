@@ -65,7 +65,7 @@ static void print_Rcon(FILE *file) {
     fprintf(file, "    0x00000000,\n");
 
     for (unsigned i = 1; i < MaxRcon; ++i) {
-        fprintf(file, "    0x%02x000000,\n", RC);
+        fprintf(file, "    0x000000%02x,\n", RC);
         RC = multiply(0x02, RC);
     }
 
@@ -76,10 +76,10 @@ static void print_s_box(FILE *file) {
     fprintf(file, "const word s_box[4][256] = {\n");
 
     const char *fmt[4] = {
-        "0x%02x000000",
-        "0x00%02x0000",
-        "0x0000%02x00",
         "0x000000%02x",
+        "0x0000%02x00",
+        "0x00%02x0000",
+        "0x%02x000000",
     };
 
     for (unsigned i = 0; i < 4; ++i) {
@@ -98,10 +98,10 @@ static void print_inverse_s_box(FILE *file) {
     fprintf(file, "const word inverse_s_box[4][256] = {\n");
 
     const char *fmt[4] = {
-        "0x%02x000000",
-        "0x00%02x0000",
-        "0x0000%02x00",
         "0x000000%02x",
+        "0x0000%02x00",
+        "0x00%02x0000",
+        "0x%02x000000",
     };
 
     for (unsigned i = 0; i < 4; ++i) {
@@ -120,7 +120,7 @@ static void print_cipher_table(FILE *file) {
     fprintf(file, "const word cipher_table[4][256] = {\n");
 
     byte t[4][256];
-    const word m[4] = {0x02, 0x01, 0x01, 0x03};
+    const word m[4] = {0x03, 0x01, 0x01, 0x02};
 
     for (unsigned i = 0; i < 4; ++i) {
         for (unsigned j = 0; j < 256; ++j) {
@@ -131,10 +131,10 @@ static void print_cipher_table(FILE *file) {
         fprintf(file, "    {");
         for (unsigned j = 0; j < 256; ++j) {
             fprintf(file, "0x%02x%02x%02x%02x",
-                    t[(4 - i) % 4][s_box[j]],
-                    t[(5 - i) % 4][s_box[j]],
-                    t[(6 - i) % 4][s_box[j]],
-                    t[(7 - i) % 4][s_box[j]]);
+                    t[(i + 0) % 4][s_box[j]],
+                    t[(i + 1) % 4][s_box[j]],
+                    t[(i + 2) % 4][s_box[j]],
+                    t[(i + 3) % 4][s_box[j]]);
             if (j != 255) fprintf(file, ", ");
         }
         fprintf(file, "},\n");
@@ -147,7 +147,7 @@ static void print_inv_cipher_table(FILE *file) {
     fprintf(file, "const word inv_cipher_table[4][256] = {\n");
 
     byte t[4][256];
-    const word m[4] = {0x0e, 0x09, 0x0d, 0x0b};
+    const word m[4] = {0x0b, 0x0d, 0x09, 0x0e};
 
     for (unsigned i = 0; i < 4; ++i) {
         for (unsigned j = 0; j < 256; ++j) {
@@ -158,10 +158,10 @@ static void print_inv_cipher_table(FILE *file) {
         fprintf(file, "    {");
         for (unsigned j = 0; j < 256; ++j) {
             fprintf(file, "0x%02x%02x%02x%02x",
-                    t[(4 - i) % 4][inverse_s_box[j]],
-                    t[(5 - i) % 4][inverse_s_box[j]],
-                    t[(6 - i) % 4][inverse_s_box[j]],
-                    t[(7 - i) % 4][inverse_s_box[j]]);
+                    t[(i + 0) % 4][inverse_s_box[j]],
+                    t[(i + 1) % 4][inverse_s_box[j]],
+                    t[(i + 2) % 4][inverse_s_box[j]],
+                    t[(i + 3) % 4][inverse_s_box[j]]);
             if (j != 255) fprintf(file, ", ");
         }
         fprintf(file, "},\n");
@@ -173,16 +173,16 @@ static void print_inv_cipher_table(FILE *file) {
 static void print_InvMixColumns_table(FILE *file) {
     fprintf(file, "const word InvMixColumns_table[4][256] = {\n");
 
-    const word m[4] = {0x0e, 0x09, 0x0d, 0x0b};
+    const word m[4] = {0x0b, 0x0d, 0x09, 0x0e};
 
     for (unsigned i = 0; i < 4; ++i) {
         fprintf(file, "    {");
         for (unsigned j = 0; j < 256; ++j) {
             fprintf(file, "0x%02x%02x%02x%02x",
-                    multiply(m[(4 - i) % 4], j),
-                    multiply(m[(5 - i) % 4], j),
-                    multiply(m[(6 - i) % 4], j),
-                    multiply(m[(7 - i) % 4], j));
+                    multiply(m[(i + 0) % 4], j),
+                    multiply(m[(i + 1) % 4], j),
+                    multiply(m[(i + 2) % 4], j),
+                    multiply(m[(i + 3) % 4], j));
             if (j != 255) fprintf(file, ", ");
         }
         fprintf(file, "},\n");

@@ -132,6 +132,9 @@ void cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *o
     if (!(in_file = fopen(in_dir, "rb"))) {
         error(": Failed to open input file.", in_dir);
     }
+    fseek(in_file, 0, SEEK_END);
+    long file_size = (ftell(in_file) / (4 * Nb) + 1) * (4 * Nb);
+    rewind(in_file);
     if (!(out_file = fopen(out_dir, "wb"))) {
         fclose(in_file);
         error(": Failed to open output file.", out_dir);
@@ -140,30 +143,35 @@ void cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *o
     word **key_processed = hex_string_to_expanded_key(Nb, Nr, key, Nk);
 
     {
-        byte *in_buffer = (byte *)malloc(4 * Nb * sizeof(byte));
-        size_t bytes_read = 0;
+        {
+            word *in_buffer = (word *)malloc(Nb * sizeof(word));
+            size_t words_read = 0;
 
-        while ((bytes_read = fread(in_buffer, sizeof(byte), 4 * Nb, in_file)) == 4 * Nb) {
-            change_endianness(Nb, (word *)in_buffer);
-            word *out_buffer = Cipher(Nb, Nr, (word *)in_buffer, key_processed);
-            change_endianness(Nb, out_buffer);
-            fwrite(out_buffer, sizeof(word), Nb, out_file);
-            free(out_buffer);
+            while (4 * (words_read + Nb) < file_size) {
+                words_read += fread(in_buffer, sizeof(word), Nb, in_file);
+                word *out_buffer = Cipher(Nb, Nr, in_buffer, key_processed);
+                fwrite(out_buffer, sizeof(word), Nb, out_file);
+                free(out_buffer);
+            }
+
+            free(in_buffer);
         }
 
         {
+            byte *in_buffer = (byte *)malloc(4 * Nb * sizeof(byte));
+            size_t bytes_read = fread(in_buffer, sizeof(byte), 4 * Nb, in_file);
+
             in_buffer[bytes_read] = 0x80;
             for (size_t i = bytes_read + 1; i < 4 * Nb; ++i) {
                 in_buffer[i] = 0x00;
             }
-            change_endianness(Nb, (word *)in_buffer);
+
             word *out_buffer = Cipher(Nb, Nr, (word *)in_buffer, key_processed);
-            change_endianness(Nb, out_buffer);
             fwrite(out_buffer, sizeof(word), Nb, out_file);
+
+            free(in_buffer);
             free(out_buffer);
         }
-
-        free(in_buffer);
     }
 
     for (unsigned i = 0; i <= Nr; ++i) free(key_processed[i]);
@@ -195,22 +203,26 @@ void inv_cipher_file(unsigned Nk, const char *key, const char *in_dir, const cha
     word **key_processed = hex_string_to_expanded_inv_key(Nb, Nr, key, Nk);
 
     {
-        byte *in_buffer = (byte *)malloc(4 * Nb * sizeof(byte));
-        size_t bytes_read = 0;
+        {
+            word *in_buffer = (word *)malloc(Nb * sizeof(word));
+            size_t words_read = 0;
 
-        while ((bytes_read += fread(in_buffer, sizeof(byte), 4 * Nb, in_file)) < file_size) {
-            change_endianness(Nb, (word *)in_buffer);
-            word *out_buffer = InvCipher(Nb, Nr, (word *)in_buffer, key_processed);
-            change_endianness(Nb, out_buffer);
-            fwrite(out_buffer, sizeof(word), Nb, out_file);
-            free(out_buffer);
+            while (4 * (words_read + Nb) < file_size) {
+                words_read += fread(in_buffer, sizeof(word), Nb, in_file);
+                word *out_buffer = InvCipher(Nb, Nr, in_buffer, key_processed);
+                fwrite(out_buffer, sizeof(word), Nb, out_file);
+                free(out_buffer);
+            }
+
+            free(in_buffer);
         }
 
         {
-            change_endianness(Nb, (word *)in_buffer);
-            byte *out_buffer = (byte *)InvCipher(Nb, Nr, (word *)in_buffer, key_processed);
-            change_endianness(Nb, (word *)out_buffer);
-            int pos = get_block_padding_position(Nb, out_buffer);
+            word *in_buffer = (word *)malloc(Nb * sizeof(word));
+            fread(in_buffer, sizeof(word), Nb, in_file);
+            word *out_buffer = InvCipher(Nb, Nr, in_buffer, key_processed);
+
+            int pos = get_block_padding_position(Nb, (byte *)out_buffer);
             if (pos < 0) {
                 free(in_buffer);
                 free(out_buffer);
@@ -221,11 +233,12 @@ void inv_cipher_file(unsigned Nk, const char *key, const char *in_dir, const cha
                 remove(out_dir);
                 error(": Could not correctly interpret input.", in_dir);
             }
+
             fwrite(out_buffer, sizeof(byte), pos, out_file);
+
+            free(in_buffer);
             free(out_buffer);
         }
-
-        free(in_buffer);
     }
 
     for (unsigned i = 0; i <= Nr; ++i) free(key_processed[i]);
@@ -270,7 +283,9 @@ static inline unsigned get_Nr(unsigned Nk) {
 static char *cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, word **key, word **in, size_t block_count) {
     char *out = (char *)malloc((block_count * 8 * Nb + 1) * sizeof(char));
     for (size_t i = 0; i < block_count; ++i) {
+        change_endianness(Nb, in[i]);
         word *out_bytes = Cipher(Nb, Nr, in[i], key);
+        change_endianness(Nb, out_bytes);
         char *out_str = block_to_string(Nb, out_bytes);
         free(out_bytes);
         memcpy(out + i * 8 * Nb, out_str, 8 * Nb * sizeof(char));
@@ -283,7 +298,9 @@ static char *cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, word **
 static char *inv_cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, word **key, word **in, size_t block_count) {
     char *out = (char *)malloc((block_count * 8 * Nb + 1) * sizeof(char));
     for (size_t i = 0; i < block_count; ++i) {
+        change_endianness(Nb, in[i]);
         word *out_bytes = InvCipher(Nb, Nr, in[i], key);
+        change_endianness(Nb, out_bytes);
         char *out_str = block_to_string(Nb, out_bytes);
         free(out_bytes);
         memcpy(out + i * 8 * Nb, out_str, 8 * Nb * sizeof(char));
@@ -301,6 +318,7 @@ static word **hex_string_to_expanded_key(unsigned Nb, unsigned Nr, const char *k
         buffer[8] = '\0';
         key[i] = strtoul(buffer, NULL, 16);
     }
+    change_endianness(Nb, key);
     word **key_expanded = KeyExpansion(Nb, Nr, key, Nk);
     free(key);
     return key_expanded;
@@ -312,10 +330,10 @@ static word **hex_string_to_expanded_inv_key(unsigned Nb, unsigned Nr, const cha
         for (unsigned j = 0; j < Nb; ++j) {
             const uword w = {key_expanded[round][j]};
             key_expanded[round][j] =
-                InvMixColumns_table[0][w.bytes[3]] ^
-                InvMixColumns_table[1][w.bytes[2]] ^
-                InvMixColumns_table[2][w.bytes[1]] ^
-                InvMixColumns_table[3][w.bytes[0]];
+                InvMixColumns_table[0][w.bytes[0]] ^
+                InvMixColumns_table[1][w.bytes[1]] ^
+                InvMixColumns_table[2][w.bytes[2]] ^
+                InvMixColumns_table[3][w.bytes[3]];
         }
     }
     return key_expanded;
