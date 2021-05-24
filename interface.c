@@ -9,8 +9,7 @@
 #include "aes.h"
 #include "io.h"
 
-static inline unsigned get_Nb();
-static inline unsigned get_Nr(unsigned Nk);
+static inline unsigned get_Nr(unsigned Nb, unsigned Nk);
 
 static char *cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, word **key, word **in, size_t block_count);
 static char *inv_cipher_hex_interface(unsigned Nb, unsigned Nk, unsigned Nr, word **key, word **in, size_t block_count);
@@ -27,8 +26,8 @@ static word *hex_string_to_block(unsigned Nb, const char *str);
 static word **hex_string_to_blocks(unsigned Nb, const char *str, size_t block_count);
 static char *block_to_string(unsigned Nb, const word block[]);
 
-char *cipher_hex(unsigned Nk, const char *key, const char *in) {
-    unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
+char *cipher_hex(unsigned Nb, unsigned Nk, const char *key, const char *in) {
+    unsigned Nr = get_Nr(Nb, Nk);
 
     char *in_processed = process_hex_string(in);
     if (strlen(in_processed) != 8 * Nb) {
@@ -50,8 +49,8 @@ char *cipher_hex(unsigned Nk, const char *key, const char *in) {
     return out;
 }
 
-char *inv_cipher_hex(unsigned Nk, const char *key, const char *in) {
-    unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
+char *inv_cipher_hex(unsigned Nb, unsigned Nk, const char *key, const char *in) {
+    unsigned Nr = get_Nr(Nb, Nk);
 
     char *in_processed = process_hex_string(in);
     if (strlen(in_processed) != 8 * Nb) {
@@ -73,8 +72,8 @@ char *inv_cipher_hex(unsigned Nk, const char *key, const char *in) {
     return out;
 }
 
-char *cipher_hex_multiblock(unsigned Nk, const char *key, const char *in) {
-    unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
+char *cipher_hex_multiblock(unsigned Nb, unsigned Nk, const char *key, const char *in) {
+    unsigned Nr = get_Nr(Nb, Nk);
 
     char *in_processed = process_hex_string(in);
     char *in_padded = string_padding(Nb, in_processed);
@@ -95,8 +94,8 @@ char *cipher_hex_multiblock(unsigned Nk, const char *key, const char *in) {
     return out;
 }
 
-char *inv_cipher_hex_multiblock(unsigned Nk, const char *key, const char *in) {
-    unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
+char *inv_cipher_hex_multiblock(unsigned Nb, unsigned Nk, const char *key, const char *in) {
+    unsigned Nr = get_Nr(Nb, Nk);
 
     char *in_processed = process_hex_string(in);
     const size_t n = strlen(in_processed);
@@ -125,8 +124,8 @@ char *inv_cipher_hex_multiblock(unsigned Nk, const char *key, const char *in) {
     return out;
 }
 
-void cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *out_dir) {
-    unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
+void cipher_file(unsigned Nb, unsigned Nk, const char *key, const char *in_dir, const char *out_dir) {
+    unsigned Nr = get_Nr(Nb, Nk);
 
     FILE *in_file, *out_file;
     if (!(in_file = fopen(in_dir, "rb"))) {
@@ -181,8 +180,8 @@ void cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *o
     fclose(out_file);
 }
 
-void inv_cipher_file(unsigned Nk, const char *key, const char *in_dir, const char *out_dir) {
-    unsigned Nb = get_Nb(), Nr = get_Nr(Nk);
+void inv_cipher_file(unsigned Nb, unsigned Nk, const char *key, const char *in_dir, const char *out_dir) {
+    unsigned Nr = get_Nr(Nb, Nk);
 
     FILE *in_file, *out_file;
     if (!(in_file = fopen(in_dir, "rb"))) {
@@ -264,18 +263,31 @@ char *process_hex_string(const char *str) {
     return new_str;
 }
 
-static inline unsigned get_Nb() {
-    return 4;
-}
-
-static inline unsigned get_Nr(unsigned Nk) {
-    switch (Nk) {
-        case 4:
-            return 10;
-        case 6:
-            return 12;
-        case 8:
-            return 14;
+static inline unsigned get_Nr(unsigned Nb, unsigned Nk) {
+    if (Nb == 4) {
+        switch (Nk) {
+            case 4:
+                return 10;
+            case 6:
+                return 12;
+            case 8:
+                return 14;
+        }
+    } else if (Nb == 6) {
+        switch (Nk) {
+            case 4:
+            case 6:
+                return 12;
+            case 8:
+                return 14;
+        }
+    } else if (Nb == 8) {
+        switch (Nk) {
+            case 4:
+            case 6:
+            case 8:
+                return 14;
+        }
     }
     return 0;
 }

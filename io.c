@@ -11,11 +11,11 @@ void error(const char *msg, const char *from) {
     exit(EXIT_FAILURE);
 }
 
-void print_multiline(const char *str, char delimiter) {
+void print_multiline(unsigned Nb, const char *str, char delimiter) {
     size_t output_len = strlen(str);
     size_t pos = 0;
-    for (; pos + 32 < output_len; pos += 32) {
-        printf("%.32s%c", str + pos, delimiter);
+    for (; pos + 8 * Nb < output_len; pos += 8 * Nb) {
+        printf("%.*s%c", 8 * Nb, str + pos, delimiter);
     }
     printf("%s\n", str + pos);
 }

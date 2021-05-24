@@ -159,6 +159,7 @@ int main(int argc, char **argv) {
     }
     char *key_processed = process_hex_string(key);
     if (key_mode == KEY_FILE) free(key);
+    unsigned Nb = 4;
     unsigned Nk;
     switch (strlen(key_processed)) {
         case 32: {
@@ -182,21 +183,21 @@ int main(int argc, char **argv) {
     char *out = NULL;
     switch (input_mode) {
         case SINGLE_BLOCK_INPUT: {
-            out = (mode == CIPHER ? cipher_hex : inv_cipher_hex)(Nk, key_processed, in_str);
-            print_multiline(out, '\n');
+            out = (mode == CIPHER ? cipher_hex : inv_cipher_hex)(Nb, Nk, key_processed, in_str);
+            print_multiline(Nb, out, '\n');
             printf("\n");
             free(out);
             break;
         }
         case MULTI_BLOCK_INPUT: {
-            out = (mode == CIPHER ? cipher_hex_multiblock : inv_cipher_hex_multiblock)(Nk, key_processed, in_str);
-            print_multiline(out, '\n');
+            out = (mode == CIPHER ? cipher_hex_multiblock : inv_cipher_hex_multiblock)(Nb, Nk, key_processed, in_str);
+            print_multiline(Nb, out, '\n');
             printf("\n");
             free(out);
             break;
         }
         case FILE_INPUT: {
-            (mode == CIPHER ? cipher_file : inv_cipher_file)(Nk, key_processed, in_dir, out_dir);
+            (mode == CIPHER ? cipher_file : inv_cipher_file)(Nb, Nk, key_processed, in_dir, out_dir);
             break;
         }
         case INPUT_UNDEFINED: {
