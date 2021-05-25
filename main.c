@@ -33,10 +33,12 @@ static const char *get_basename(const char *path) {
 
 static char *read_from_file(const char *filename);
 
-void usage(const char *basename) {
-    printf(
+void usage(const char *basename, int is_failure) {
+    fprintf(
+        is_failure ? stderr : stdin,
         "Usage:\n"
-        "    %s {-e|-d} [-t] { -s <hex-string> | -f <in> <out> } { -k <key> | -kfile <file> }\n"
+        "    %s {-e|-d} [-t] { -s <hex-string> | -f <in> <out> }\n"
+        "        { -k <key> | -kfile <file> }\n"
         "    %s {-h|--help}\n"
         "\n"
         "Options:\n"
@@ -64,7 +66,7 @@ void usage(const char *basename) {
         "  -h, --help    Display this help message.\n"
         "\n",
         basename, basename);
-    exit(EXIT_FAILURE);
+    exit(is_failure ? EXIT_FAILURE : EXIT_SUCCESS);
 }
 
 int main(int argc, char **argv) {
@@ -72,7 +74,7 @@ int main(int argc, char **argv) {
 
     const char *basename = get_basename(argv[0]);
 
-    if (argc == 1) usage(basename);
+    if (argc == 1) usage(basename, 1);
 
     Mode mode = UNDEFINED;
     InputMode input_mode = INPUT_UNDEFINED;
@@ -116,9 +118,9 @@ int main(int argc, char **argv) {
             if (++i == argc) error("No key file.", NULL);
             key_dir = argv[i];
         } else if (strcmp(argv[i], "-h") == 0) {
-            usage(basename);
+            usage(basename, 0);
         } else if (strcmp(argv[i], "--help") == 0) {
-            usage(basename);
+            usage(basename, 0);
         } else {
             error("Invalid argument.", NULL);
         }
