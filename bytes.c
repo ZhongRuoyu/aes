@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "aes.h"
 
 void change_endianness(unsigned Nb, word block[]) {
