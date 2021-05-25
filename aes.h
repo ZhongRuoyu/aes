@@ -49,11 +49,8 @@ extern const word InvMixColumns_table[4][256];
 
 // interface.c begin
 
-char *cipher_hex(unsigned Nb, unsigned Nk, const char *key, const char *in);
-char *inv_cipher_hex(unsigned Nb, unsigned Nk, const char *key, const char *in);
-
-void cipher_file(unsigned Nb, unsigned Nk, const char *key, const char *in_dir, const char *out_dir);
-void inv_cipher_file(unsigned Nb, unsigned Nk, const char *key, const char *in_dir, const char *out_dir);
+char *cipher_hex(unsigned Nb, unsigned Nk, const char *key, const char *in, int for_encryption);
+void cipher_file(unsigned Nb, unsigned Nk, const char *key, const char *in_dir, const char *out_dir, int for_encryption);
 
 char *process_hex_string(const char *str);
 

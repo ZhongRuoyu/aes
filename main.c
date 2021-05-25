@@ -157,13 +157,13 @@ int main(int argc, char **argv) {
     char *out = NULL;
     switch (input_mode) {
         case HEX_STRING_INPUT: {
-            out = (mode == CIPHER ? cipher_hex : inv_cipher_hex)(Nb, Nk, key_processed, in_str);
+            out = cipher_hex(Nb, Nk, key_processed, in_str, (mode == CIPHER));
             printf("%s\n\n", out);
             free(out);
             break;
         }
         case FILE_INPUT: {
-            (mode == CIPHER ? cipher_file : inv_cipher_file)(Nb, Nk, key_processed, in_dir, out_dir);
+            cipher_file(Nb, Nk, key_processed, in_dir, out_dir, (mode == CIPHER));
             break;
         }
         case INPUT_UNDEFINED: {
