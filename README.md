@@ -40,6 +40,4 @@ aes -e -s "3243f6a8 885a308d 313198a2 e0370734" -k "2b7e1516 28aed2a6 abf71588 0
 
 Copyright (c) 2021 Zhong Ruoyu.
 
-Licensed under the MIT license.
-
-For more information, see [LICENSE](/LICENSE).
+This repository is licensed under the MIT License. See [LICENSE](/LICENSE) for more information.
