@@ -85,7 +85,7 @@ int main(int argc, char **argv) {
     char *key_dir = NULL;
     char *key = NULL;
 
-    for (unsigned i = 1; i < argc; ++i) {
+    for (int i = 1; i < argc; ++i) {
         if (strcmp(argv[i], "-e") == 0) {
             if (mode != UNDEFINED) error("Only one cipher mode can be specified.", NULL);
             mode = CIPHER;
