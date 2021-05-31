@@ -30,17 +30,15 @@ If you are running on a platform where `make` is not well supported (e.g. Window
 To build, `git clone` this repository, or download a zipped archive. Open a terminal in the root directory of the repository, and build the executable by including all the source files in the [/src](/src) directory, with include path [/include](/include). For instance, using `clang` on Windows with PowerShell:
 
 ```powershell
-clang src/*.c -I include -std=c11 -o aes.exe
+clang src/*.c -I include -std=c11 -O2 -o aes.exe
 ```
 
 The source file [/src/data.c](/src/data.c) may be generated with [/data/makedata.c](/data/makedata.c):
 
 ```powershell
-clang data/makedata.c -I include -std=c11 -o makedata.exe
+clang data/makedata.c -I include -std=c11 -O2 -o makedata.exe
 ./makedata.exe src/data.c
 ```
-
-Compiler optimisation can be turned on to enable better performance.
 
 ## To Use
 
