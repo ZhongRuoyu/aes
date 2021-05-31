@@ -145,7 +145,7 @@ static void inv_cipher_file_interface(unsigned Nb, unsigned Nk, const char *key,
 
         {
             word *in_buffer = (word *)malloc(Nb * sizeof(word));
-            fread(in_buffer, sizeof(word), Nb, in_file);
+            size_t words_read = fread(in_buffer, sizeof(word), Nb, in_file);
             word *out_buffer = InvCipher(Nb, Nr, in_buffer, key_processed);
 
             int pos = get_block_padding_position(Nb, (byte *)out_buffer);
