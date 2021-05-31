@@ -1,9 +1,7 @@
-*
-!/**/
-!*.*
+*.o
+/aes
 
 *.exe
-*.out
 
 /.vscode/
 /test/
