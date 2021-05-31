@@ -1,9 +1,8 @@
 CC          = clang
 CFLAGS      = -I include -std=c11
 
-OBJ         = src/bytes.o src/cipher.o src/data.o \
-              src/interface.o src/io.o src/key.o \
-              src/main.o
+OBJ         = src/bytes.o src/cipher.o src/data.o src/interface.o src/io.o \
+              src/key.o src/main.o
 DATA_SRC    = data/makedata.c
 DATA        = src/data.c
 
