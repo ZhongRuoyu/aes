@@ -93,7 +93,7 @@ static void print_table(FILE *file, const char *name, const word s_box[], const 
             t[i][j] = multiply(m[i % 4], j);
         }
     }
-    
+
     for (unsigned i = 0; i < 4; ++i) {
         fprintf(file, "    {");
         for (unsigned j = 0; j < 256; ++j) {
@@ -129,10 +129,18 @@ static void print_MixColumns_table(FILE *file, const char *name, const word m[])
     fprintf(file, "};\n");
 }
 
-int main() {
+static void usage() {
+    fprintf(stderr,
+            "Error: this program needs exactly one argument as the path to the output file.\n");
+    exit(EXIT_FAILURE);
+}
+
+int main(int argc, char **argv) {
+    if (argc != 2) usage();
+
     FILE *file;
-    if (!(file = fopen("data.c", "w"))) {
-        fprintf(stderr, "Failed to open output file.\n");
+    if (!(file = fopen(argv[1], "w"))) {
+        fprintf(stderr, "%s: failed to open output file.\n", argv[1]);
         exit(EXIT_FAILURE);
     }
 
