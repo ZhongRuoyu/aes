@@ -17,7 +17,7 @@ All the "flavours" of the algorithm, i.e. AES-128, AES-192, and AES-256, are sup
 ```bash
 $ sudo apt install build-essential clang git
 $ git clone https://github.com/ZhongRuoyu/AES.git
-$ cd aes
+$ cd AES
 $ make
 ```
 
