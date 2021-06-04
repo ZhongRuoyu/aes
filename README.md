@@ -12,10 +12,16 @@ All the "flavours" of the algorithm, i.e. AES-128, AES-192, and AES-256, are sup
 
 ### Building with GNU Make
 
-`AES` can be easily built with GNU Make, using the following commands.
+`AES` can be easily built with GNU Make. To do so, you may need to install `make`, `clang`, and `git` using your package manager. For instance:
 
 ```bash
-$ sudo apt install build-essential clang git
+$ sudo apt install build-essential clang git  # for Debian, Ubuntu, and related
+$ sudo dnf install make clang git             # for Fedora, Red Hat, and related
+```
+
+With the requirements satisfied, the executable can be built as follows.
+
+```bash
 $ git clone https://github.com/ZhongRuoyu/AES.git
 $ cd AES
 $ make
