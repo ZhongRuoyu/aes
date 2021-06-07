@@ -35,7 +35,7 @@ static char *read_from_file(const char *filename);
 
 void usage(const char *basename, int is_failure) {
     fprintf(
-        is_failure ? stderr : stdin,
+        is_failure ? stderr : stdout,
         "Usage:\n"
         "    %s {-e|-d} [-t] { -s <hex-string> | -f <in> <out> }\n"
         "        { -k <key> | -kfile <file> }\n"
